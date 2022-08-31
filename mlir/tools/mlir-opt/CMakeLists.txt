@@ -71,8 +71,10 @@ add_mlir_tool(mlir-opt
 
   DEPENDS
   ${LIBS}
+  SUPPORT_PLUGINS
   )
-target_link_libraries(mlir-opt PRIVATE ${LIBS})
+target_link_libraries(mlir-opt PUBLIC ${LIBS})
+export_executable_symbols_for_plugins(mlir-opt)
 llvm_update_compile_flags(mlir-opt)
 
 mlir_check_all_link_libraries(mlir-opt)

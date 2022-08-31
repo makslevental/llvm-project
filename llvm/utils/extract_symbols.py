@@ -336,6 +336,9 @@ def extract_symbols(arg):
     get_symbols, should_keep_symbol, calling_convention_decoration, lib = arg
     symbols = dict()
     for symbol in get_symbols(lib):
+        if "mlir4Pass" in symbol:
+            symbols[symbol] = 1 + symbols.setdefault(symbol,0)
+            continue
         symbol = should_keep_symbol(symbol, calling_convention_decoration)
         if symbol:
             symbols[symbol] = 1 + symbols.setdefault(symbol,0)
@@ -489,7 +492,7 @@ if __name__ == '__main__':
             if match:
                 try:
                     names, _ = parse_itanium_nested_name(match.group(2))
-                    if names and names[-2][1]:
+                    if (names and len(names) > 1 and names[-2][1]):
                         name = ''.join([x for x,_ in names])
                 except TooComplexName:
                     # Manglings that are too complex should already have been
@@ -517,3 +520,17 @@ if __name__ == '__main__':
         template_count = template_function_count[template_function_mapping[k]]
         if v == 1 and template_count < 100:
             print(k, file=outfile)
+
+    extra = """\
+_ZTVN4mlir4PassE
+_ZN4mlir12registerPassERKSt8functionIFSt10unique_ptrINS_4PassESt14default_deleteIS2_EEvEE
+_ZNK4mlir10StringAttr8getValueEv
+_ZN4mlir6detail14TypeIDResolverINS_8ModuleOpEvE2idE
+_ZN4mlir9Operation4dumpEv
+_ZN4mlir8ModuleOp10getSymNameEv
+_ZN4mlir8ModuleOp13getBodyRegionEv
+_ZN4mlir6Region10OpIteratorC1EPS0_b
+_ZN4llvm12ilist_detail18SpecificNodeAccessINS0_12node_optionsIN4mlir9OperationELb1ELb0EvEEE11getValuePtrEPNS_15ilist_node_implIS5_EE
+"""
+    for e in extra.splitlines():
+        print(e, file=outfile)

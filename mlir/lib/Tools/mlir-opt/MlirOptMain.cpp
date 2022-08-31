@@ -34,6 +34,7 @@
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/ThreadPool.h"
 #include "llvm/Support/ToolOutputFile.h"
+#include "mlir/Pass/PassPlugin.h"
 
 using namespace mlir;
 using namespace llvm;
@@ -223,6 +224,21 @@ LogicalResult mlir::MlirOptMain(int argc, char **argv, llvm::StringRef toolName,
   static cl::opt<bool> showDialects(
       "show-dialects", cl::desc("Print the list of registered dialects"),
       cl::init(false));
+
+  static cl::list<std::string>
+      PassPlugins("load-pass-plugin",
+                  cl::desc("Load passes from plugin library"));
+  SmallVector<mlir::PassPlugin, 1> PluginList;
+  PassPlugins.setCallback([&](const std::string &PluginPath) {
+    auto Plugin = PassPlugin::Load(PluginPath);
+    if (!Plugin) {
+      errs() << "Failed to load passes from '" << PluginPath
+             << "'. Request ignored.\n";
+      return;
+    }
+    Plugin.get().registerPassManagerCallbacks();
+  });
+
 
   InitLLVM y(argc, argv);
 

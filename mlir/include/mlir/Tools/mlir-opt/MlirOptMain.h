@@ -14,6 +14,7 @@
 #define MLIR_TOOLS_MLIROPT_MLIROPTMAIN_H
 
 #include "mlir/Support/LogicalResult.h"
+#include "mlir/Pass/PassPlugin.h"
 #include "llvm/ADT/StringRef.h"
 
 #include <cstdlib>
