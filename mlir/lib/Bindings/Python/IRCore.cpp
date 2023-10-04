@@ -1359,9 +1359,9 @@ py::object PyOperation::create(const std::string &name,
     mlirSuccessors.reserve(successors->size());
     for (auto *successor : *successors) {
       // TODO: Verify successor originate from the same context.
-      if (!successor)
-        throw py::value_error("successor block cannot be None");
-      mlirSuccessors.push_back(successor->get());
+      if (successor) {
+        mlirSuccessors.push_back(successor->get());
+      }
     }
   }
 
