@@ -144,5 +144,21 @@ void mlir::python::populatePassManagerSubmodule(py::module &m) {
             return printAccum.join();
           },
           "Print the textual representation for this PassManager, suitable to "
-          "be passed to `parse` for round-tripping.");
+          "be passed to `parse` for round-tripping.")
+      .def_property_readonly_static(
+          "all_pass_args",
+          [](py::object & /*class*/) {
+            intptr_t numPassArgs = mlirPassNumRegisteredPassArgs();
+            std::vector<MlirStringRef> allPassArgsStrRefs(numPassArgs);
+            mlirAllRegisteredPassArgs(allPassArgsStrRefs.data());
+            std::vector<std::string> allPassArgs(numPassArgs);
+            for (int i = 0; i < numPassArgs; ++i)
+              allPassArgs[i] = unwrap(allPassArgsStrRefs[i]).str();
+            return allPassArgs;
+          })
+      .def_static("get_pass_info",
+                  [](std::string passArg) {
+                    mlirPassGetRegisteredPassInfo(
+                        mlirStringRefCreate(passArg.data(), passArg.size()));
+                  });
 }

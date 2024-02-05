@@ -65,6 +65,7 @@ struct TestBytecodeRoundtripPass
   }
 
   void runOnOperation() override {
+    testKind.getParser().getValueName();
     switch (testKind) {
       // Tests 0-5 implement a custom roundtrip with callbacks.
     case (0):

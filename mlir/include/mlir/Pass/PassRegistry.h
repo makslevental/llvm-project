@@ -17,8 +17,9 @@
 #include "mlir/Pass/PassOptions.h"
 #include "mlir/Support/TypeID.h"
 #include <functional>
-#include <utility>
+#include <llvm/ADT/SetVector.h>
 #include <optional>
+#include <utility>
 
 namespace mlir {
 class OpPassManager;
@@ -74,6 +75,8 @@ public:
   /// Return the maximum width required when printing the options of this entry.
   size_t getOptionWidth() const;
 
+  SmallVector<detail::PassOptions::PassInfo, 4> getPassOptions() const;
+
 protected:
   PassRegistryEntry(
       StringRef arg, StringRef description, const PassRegistryFunction &builder,
@@ -121,6 +124,11 @@ public:
 
   /// Returns the pass info for the specified pass class or null if unknown.
   static const PassInfo *lookup(StringRef passArg);
+
+  /// Returns all pass args corresponding to passes in the pass registry.
+  static llvm::SmallSetVector<StringRef, 32> allRegisteredPassArgs();
+
+  static intptr_t numRegisteredPassArgs();
 };
 
 //===----------------------------------------------------------------------===//

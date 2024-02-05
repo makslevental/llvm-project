@@ -23,6 +23,7 @@
 #include <memory>
 
 namespace mlir {
+class PassRegistryEntry;
 class OpPassManager;
 
 namespace detail {
@@ -108,6 +109,7 @@ private:
 
     /// Allow access to private methods.
     friend PassOptions;
+    friend PassRegistryEntry;
   };
 
   /// This is the parser that is used by pass options that use literal options.
@@ -141,6 +143,12 @@ private:
   }
 
 public:
+  struct PassInfo {
+    /// The name and value of this option to the given stream.
+    std::string nameValue;
+    std::string argStr;
+    std::string helpStr;
+  };
   /// The specific parser to use depending on llvm::cl parser used. This is only
   /// necessary because we need to provide additional methods for certain data
   /// type parsers.
@@ -305,6 +313,8 @@ public:
 
   /// Return the maximum width required when printing the help string.
   size_t getOptionWidth() const;
+
+  friend PassRegistryEntry;
 
 private:
   /// A list of all of the opaque options.

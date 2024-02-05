@@ -314,3 +314,13 @@ def testPrintIrAfterAll():
         # CHECK:   }
         # CHECK: }
         pm.run(module)
+
+
+# CHECK-LABEL: TEST: testAllPassArgs
+@run
+def testAllPassArgs():
+    with Context() as ctx:
+        # print()
+        for pass_arg in PassManager.all_pass_args:
+            # print(pass_arg)
+            PassManager.get_pass_info(pass_arg)

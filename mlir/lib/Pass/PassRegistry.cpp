@@ -90,6 +90,41 @@ size_t PassRegistryEntry::getOptionWidth() const {
   return maxLen;
 }
 
+#include <iostream>
+
+SmallVector<PassOptions::PassInfo, 4>
+PassRegistryEntry::getPassOptions() const {
+  SmallVector<PassOptions::PassInfo, 4> passInfos;
+  optHandler([&](const PassOptions &options) {
+    for (auto &&[k, v] : options.OptionsMap) {
+      std::cout << "k: " << k.str() << "\n";
+      std::cout << "ValueStr: " << v->ValueStr.str() << "\n";
+      std::cout << "ArgStr: " << v->ArgStr.str() << "\n";
+      std::cout << "HelpStr: " << v->HelpStr.str() << "\n";
+      std::cout << "isDefaultOption: " << v->isDefaultOption() << "\n";
+      v->printOptionInfo(100);
+      // std::cout << "bool: " << dynamic_cast<llvm::cl::Option<bool> *>(v)
+      //           << "\n";
+    }
+    std::cout << "\n";
+
+    // SmallVector<PassOptions::OptionBase *, 4> orderedOps(
+    //     options.options.begin(), options.options.end());
+    // for (PassOptions::OptionBase *option : orderedOps) {
+    //   if (option->getOption()->hasArgStr()) {
+    //     std::string cpp;
+    //     llvm::raw_string_ostream os(cpp);
+    //     option->print(os);
+    //     passInfos.push_back({cpp, option->getOption()->ArgStr.str(),
+    //                          option->getOption()->HelpStr.str()});
+    //   } else {
+    //     std::cerr << "wtfbbq\n";
+    //   }
+    // }
+  });
+  return passInfos;
+}
+
 //===----------------------------------------------------------------------===//
 // PassPipelineInfo
 //===----------------------------------------------------------------------===//
@@ -146,6 +181,17 @@ void mlir::registerPass(const PassAllocatorFunction &function) {
 const PassInfo *mlir::PassInfo::lookup(StringRef passArg) {
   auto it = passRegistry->find(passArg);
   return it == passRegistry->end() ? nullptr : &it->second;
+}
+
+llvm::SmallSetVector<llvm::StringRef, 32>
+mlir::PassInfo::allRegisteredPassArgs() {
+  llvm::SmallSetVector<llvm::StringRef, 32> passArgs(
+      passRegistry->keys().begin(), passRegistry->keys().end());
+  return passArgs;
+}
+
+intptr_t mlir::PassInfo::numRegisteredPassArgs() {
+  return passRegistry->size();
 }
 
 /// Returns the pass pipeline info for the specified pass pipeline argument or

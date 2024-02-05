@@ -130,6 +130,11 @@ MLIR_CAPI_EXPORTED MlirLogicalResult
 mlirParsePassPipeline(MlirOpPassManager passManager, MlirStringRef pipeline,
                       MlirStringCallback callback, void *userData);
 
+MLIR_CAPI_EXPORTED intptr_t mlirPassNumRegisteredPassArgs();
+
+MLIR_CAPI_EXPORTED void mlirAllRegisteredPassArgs(MlirStringRef *allPassArgs);
+MLIR_CAPI_EXPORTED void mlirPassGetRegisteredPassInfo(MlirStringRef passArg);
+
 //===----------------------------------------------------------------------===//
 // External Pass API.
 //

@@ -97,6 +97,33 @@ MlirLogicalResult mlirParsePassPipeline(MlirOpPassManager passManager,
   return wrap(pm);
 }
 
+intptr_t mlirPassNumRegisteredPassArgs() {
+  return PassInfo::numRegisteredPassArgs();
+}
+
+void mlirAllRegisteredPassArgs(MlirStringRef *allPassArgs) {
+  llvm::SmallSetVector<llvm::StringRef, 32> passArgs =
+      PassInfo::allRegisteredPassArgs();
+  for (size_t i = 0; i < passArgs.size(); ++i) {
+    allPassArgs[i] = wrap(passArgs[i]);
+  }
+}
+
+#include <iostream>
+
+void mlirPassGetRegisteredPassInfo(MlirStringRef passArg) {
+  const PassInfo *passInfo = PassInfo::lookup(unwrap(passArg));
+  std::cout << "getPassArgument: " << passInfo->getPassArgument().str() << "\n";
+  std::cout << "getPassDescription: " << passInfo->getPassDescription().str()
+            << "\n";
+  for (auto option : passInfo->getPassOptions()) {
+    std::cout << "nameValue: " << option.nameValue << "\n";
+    std::cout << "argStr: " << option.argStr << "\n";
+    std::cout << "helpStr: " << option.helpStr << "\n";
+  }
+  std::cout << "\n";
+}
+
 //===----------------------------------------------------------------------===//
 // External Pass API.
 //===----------------------------------------------------------------------===//

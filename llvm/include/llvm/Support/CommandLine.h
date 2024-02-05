@@ -368,7 +368,7 @@ public:
   // Print out information about this option. The to-be-maintained width is
   // specified.
   //
-  virtual void printOptionInfo(size_t GlobalWidth) const = 0;
+  virtual void printOptionInfo(size_t GlobalWidth, raw_fd_ostream &os) const = 0;
 
   virtual void printOptionValue(size_t GlobalWidth, bool Force) const = 0;
 
