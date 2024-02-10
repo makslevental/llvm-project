@@ -862,6 +862,137 @@ mlir_c_api_cc_library(
     ],
 )
 
+##---------------------------------------------------------------------------##
+# Sources of Python bindings.
+#----------------------------------------------------------------------------##
+
+exports_files(
+    glob(["lib/Bindings/Python/**/*.cpp"]),
+)
+
+MLIR_BINDINGS_PYTHON_HEADERS = [
+    "lib/Bindings/Python/*.h",
+    "include/mlir-c/Bindings/Python/*.h",
+    "include/mlir/Bindings/Python/*.h",
+]
+
+cc_library(
+    name = "MLIRBindingsPythonHeaders",
+    includes = [
+        "include",
+        "lib/Bindings/Python",
+    ],
+    tags = [
+        "manual",  # External dependency
+        "nobuildkite",  # TODO(gcmn): Add support for this target
+    ],
+    textual_hdrs = glob(MLIR_BINDINGS_PYTHON_HEADERS),
+    deps = [
+        ":CAPIIRHeaders",
+        "@local_config_python//:python_headers",
+        "@pybind11",
+    ],
+)
+
+cc_library(
+    name = "MLIRBindingsPythonHeadersAndDeps",
+    includes = [
+        "include",
+        "lib/Bindings/Python",
+    ],
+    tags = [
+        "manual",  # External dependency
+        "nobuildkite",  # TODO(gcmn): Add support for this target
+    ],
+    textual_hdrs = glob(MLIR_BINDINGS_PYTHON_HEADERS),
+    deps = [
+        ":CAPIIR",
+        "@local_config_python//:python_headers",
+        "@pybind11",
+    ],
+)
+
+# These flags are needed for pybind11 to work.
+PYBIND11_COPTS = [
+    "-fexceptions",
+    "-frtti",
+]
+
+PYBIND11_FEATURES = [
+    # Cannot use header_modules (parse_headers feature fails).
+    "-use_header_modules",
+]
+
+MLIR_PYTHON_BINDINGS_SOURCES = [
+    "lib/Bindings/Python/IRAffine.cpp",
+    "lib/Bindings/Python/IRAttributes.cpp",
+    "lib/Bindings/Python/IRCore.cpp",
+    "lib/Bindings/Python/IRInterfaces.cpp",
+    "lib/Bindings/Python/IRModule.cpp",
+    "lib/Bindings/Python/IRTypes.cpp",
+    "lib/Bindings/Python/Pass.cpp",
+]
+
+cc_library(
+    name = "MLIRBindingsPythonCore",
+    srcs = MLIR_PYTHON_BINDINGS_SOURCES,
+    copts = PYBIND11_COPTS,
+    features = PYBIND11_FEATURES,
+    tags = [
+        "manual",  # External dependency
+        "nobuildkite",  # TODO(gcmn): Add support for this target
+    ],
+    deps = [
+        ":CAPIAsync",
+        ":CAPIDebug",
+        ":CAPIIR",
+        ":CAPIInterfaces",
+        ":MLIRBindingsPythonHeadersAndDeps",
+        ":Support",
+        "//llvm:Support",
+        "@local_config_python//:python_headers",
+        "@pybind11",
+    ],
+)
+
+cc_library(
+    name = "MLIRBindingsPythonCoreNoCAPI",
+    srcs = MLIR_PYTHON_BINDINGS_SOURCES,
+    copts = PYBIND11_COPTS,
+    features = PYBIND11_FEATURES,
+    tags = [
+        "manual",  # External dependency
+        "nobuildkite",  # TODO(gcmn): Add support for this target
+    ],
+    deps = [
+        ":CAPIAsyncHeaders",
+        ":CAPIDebugHeaders",
+        ":CAPIIRHeaders",
+        ":MLIRBindingsPythonHeaders",
+        "//llvm:Support",
+        "@local_config_python//:python_headers",
+        "@pybind11",
+    ],
+)
+
+# Target that bundles together the CAPI objects needed for
+# MLIRBindingsPythonCoreNoCAPI.
+cc_library(
+    name = "MLIRBindingsPythonCAPIObjects",
+    tags = [
+        "manual",  # External dependency
+        "nobuildkite",  # TODO(gcmn): Add support for this target
+    ],
+    deps = [
+        ":CAPIAsyncObjects",
+        ":CAPIDebugObjects",
+        ":CAPIIRObjects",
+        ":CAPIInterfacesObjects",
+    ],
+)
+
+##---------------------------------------------------------------------------##
+
 td_library(
     name = "AttrTdFiles",
     srcs = [
