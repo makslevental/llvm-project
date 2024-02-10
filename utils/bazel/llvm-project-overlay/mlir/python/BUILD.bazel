@@ -8,11 +8,86 @@
 # We define separate filegroups for files in different directories so
 # that downstream users can mirror the tree in their own py_library() rules.
 
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
 load("//mlir:tblgen.bzl", "gentbl_filegroup", "td_library")
 
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
+
+##---------------------------------------------------------------------------##
+# Sources of Python bindings.
+#----------------------------------------------------------------------------##
+
+# Dynamic library with the MLIR Python extension.
+pybind_extension(
+    name = "mlir/_mlir_libs/_mlir",
+    srcs = ["//mlir:lib/Bindings/Python/MainModule.cpp"],
+    deps = [
+        "//mlir:MLIRBindingsPythonCore",
+    ],
+)
+
+pybind_extension(
+    name = "mlir/_mlir_libs/_mlirDialectsLinalg",
+    srcs = ["//mlir:lib/Bindings/Python/DialectLinalg.cpp"],
+    deps = [
+        "//mlir:CAPIIR",
+        "//mlir:CAPILinalg",
+        "//mlir:MLIRBindingsPythonHeadersAndDeps",
+    ],
+)
+
+pybind_extension(
+    name = "mlir/_mlir_libs/_mlirDialectsQuant",
+    srcs = ["//mlir:lib/Bindings/Python/DialectQuant.cpp"],
+    deps = [
+        "//mlir:CAPIIR",
+        "//mlir:CAPIQuant",
+        "//mlir:MLIRBindingsPythonHeadersAndDeps",
+    ],
+)
+
+pybind_extension(
+    name = "mlir/_mlir_libs/_mlirDialectsSparseTensor",
+    srcs = ["//mlir:lib/Bindings/Python/DialectSparseTensor.cpp"],
+    deps = [
+        "//mlir:CAPIIR",
+        "//mlir:CAPISparseTensor",
+        "//mlir:MLIRBindingsPythonHeadersAndDeps",
+    ],
+)
+
+# Dynamic library with the MLIR Conversions Python extension.
+pybind_extension(
+    name = "mlir/_mlir_libs/_mlirExecutionEngine",
+    srcs = ["//mlir:lib/Bindings/Python/ExecutionEngineModule.cpp"],
+    deps = [
+        "//mlir:CAPIExecutionEngine",
+        "//mlir:MLIRBindingsPythonHeadersAndDeps",
+    ],
+)
+
+# Dynamic library with the MLIR Linalg dialect+passes Python extension.
+pybind_extension(
+    name = "mlir/_mlir_libs/_mlirLinalgPasses",
+    srcs = ["//mlir:lib/Bindings/Python/LinalgPasses.cpp"],
+    deps = [
+        "//mlir:CAPILinalg",
+        "//mlir:MLIRBindingsPythonHeadersAndDeps",
+    ],
+)
+
+pybind_extension(
+    name = "mlir/_mlir_libs/_mlirRegisterEverything",
+    srcs = ["//mlir:lib/Bindings/Python/RegisterEverything.cpp"],
+    deps = [
+        "//mlir:CAPIConversion",
+        "//mlir:CAPITransforms",
+        "//mlir:CAPIRegisterEverything",
+        "//mlir:MLIRBindingsPythonHeadersAndDeps",
+    ],
+)
 
 ##---------------------------------------------------------------------------##
 # Core IR modules.
