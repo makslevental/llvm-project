@@ -648,3 +648,13 @@ class VectorizeChildrenAndApplyPatternsOp(VectorizeChildrenAndApplyPatternsOp):
             loc=loc,
             ip=ip,
         )
+
+
+@register_attribute_builder("builtin.MatchInterfaceEnum")
+def _matchinterfaceenum(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(32, context=context), int(x))
+
+
+@register_attribute_builder("builtin.TransposeMatmulInput")
+def _transposematmulinput(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(32, context=context), int(x))

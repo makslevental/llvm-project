@@ -43,6 +43,7 @@ class Handle(ir.Value):
         self.parent = parent
         self.children = children if children is not None else []
 
+
 @ir.register_value_caster(AnyOpType.get_static_typeid())
 @ir.register_value_caster(OperationType.get_static_typeid())
 class OpHandle(Handle):

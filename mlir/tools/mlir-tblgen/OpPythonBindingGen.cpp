@@ -283,7 +283,7 @@ def {0}({2}) -> {4}:
 static llvm::cl::OptionCategory
     clOpPythonBindingCat("Options for -gen-python-op-bindings");
 
-static llvm::cl::opt<std::string>
+llvm::cl::opt<std::string>
     clDialectName("bind-dialect",
                   llvm::cl::desc("The dialect to run the generator for"),
                   llvm::cl::init(""), llvm::cl::cat(clOpPythonBindingCat));
@@ -672,12 +672,15 @@ populateBuilderLinesAttr(const Operator &op, ArrayRef<std::string> argNames,
           formatv(initUnitAttributeTemplate, attribute->name, argNames[i]));
       continue;
     }
-
+    Dialect maybeDialect = attribute->attr.getBaseAttr().getDialect();
+    auto disambigAttrName = formatv(
+        "{0}.{1}", bool(maybeDialect) ? maybeDialect.getName() : "builtin",
+        attribute->attr.getAttrDefName());
     builderLines.push_back(formatv(
         attribute->attr.isOptional() || attribute->attr.hasDefaultValue()
             ? initOptionalAttributeWithBuilderTemplate
             : initAttributeWithBuilderTemplate,
-        argNames[i], attribute->name, attribute->attr.getAttrDefName()));
+        argNames[i], attribute->name, disambigAttrName));
   }
 }
 

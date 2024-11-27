@@ -219,3 +219,13 @@ AnyOpTypeT = NewType("AnyOpType", AnyOpType)
 
 def any_op_t() -> AnyOpTypeT:
     return AnyOpTypeT(AnyOpType.get())
+
+
+@register_attribute_builder("builtin.FailurePropagationMode")
+def _failurepropagationmode(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(32, context=context), int(x))
+
+
+@register_attribute_builder("builtin.MatchCmpIPredicateAttr")
+def _matchcmpipredicateattr(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(32, context=context), int(x))
