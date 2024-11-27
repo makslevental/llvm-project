@@ -108,3 +108,38 @@ def constant(
     result: Type, value: Union[int, float, Attribute, _array], *, loc=None, ip=None
 ) -> Value:
     return _get_op_result_or_op_results(ConstantOp(result, value, loc=loc, ip=ip))
+
+
+@register_attribute_builder("builtin.Arith_CmpFPredicateAttr")
+def _arith_cmpfpredicateattr(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(64, context=context), int(x))
+
+
+@register_attribute_builder("builtin.Arith_CmpIPredicateAttr")
+def _arith_cmpipredicateattr(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(64, context=context), int(x))
+
+
+@register_attribute_builder("builtin.Arith_DenormalMode")
+def _arith_denormalmode(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(32, context=context), int(x))
+
+
+@register_attribute_builder("builtin.Arith_IntegerOverflowFlags")
+def _arith_integeroverflowflags(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(32, context=context), int(x))
+
+
+@register_attribute_builder("builtin.Arith_RoundingModeAttr")
+def _arith_roundingmodeattr(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(32, context=context), int(x))
+
+
+@register_attribute_builder("builtin.AtomicRMWKindAttr")
+def _atomicrmwkindattr(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(64, context=context), int(x))
+
+
+@register_attribute_builder("builtin.FastMathFlags")
+def _fastmathflags(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(32, context=context), int(x))

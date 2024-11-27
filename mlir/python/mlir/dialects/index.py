@@ -2,5 +2,11 @@
 #  See https://llvm.org/LICENSE.txt for license information.
 #  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
+from ..ir import IntegerAttr, IntegerType, register_attribute_builder
 from ._index_ops_gen import *
 from ._index_enum_gen import *
+
+
+@register_attribute_builder("builtin.IndexCmpPredicate")
+def _indexcmppredicate(x, context):
+    return IntegerAttr.get(IntegerType.get_signless(32, context=context), int(x))

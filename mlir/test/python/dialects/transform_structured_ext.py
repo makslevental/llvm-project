@@ -586,7 +586,7 @@ def testMatchInterfaceEnum(target):
 @run
 @create_sequence
 def testMatchInterfaceEnumReplaceAttributeBuilder(target):
-    @register_attribute_builder("MatchInterfaceEnum", replace=True)
+    @register_attribute_builder("builtin.MatchInterfaceEnum", replace=True)
     def match_interface_enum(x, context):
         if x == "LinalgOp":
             y = 0

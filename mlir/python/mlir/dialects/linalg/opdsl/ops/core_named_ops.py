@@ -888,6 +888,7 @@ def conv_2d_nchw_fchw_q(
         - TypeFn.cast_signed(U, IZp)
     ) * (TypeFn.cast_signed(U, K[D.f, D.c, D.kh, D.kw]) - TypeFn.cast_signed(U, KZp))
 
+
 @linalg_structured_op
 def conv_2d_nchw_fchw(
     I=TensorDef(T1, S.N, S.C, S.OH * S.SH + S.KH * S.DH, S.OW * S.SW + S.KW * S.DW),
@@ -1082,16 +1083,19 @@ def conv_3d_ndhwc_dhwcf(
     """
     implements(ConvolutionOpInterface)
     domain(D.n, D.od, D.oh, D.ow, D.f, D.kd, D.kh, D.kw, D.c)
-    O[D.n, D.od, D.oh, D.ow, D.f] += TypeFn.cast_signed(
-        U,
-        I[
-            D.n,
-            D.od * S.SD + D.kd * S.DD,
-            D.oh * S.SH + D.kh * S.DH,
-            D.ow * S.SW + D.kw * S.DW,
-            D.c,
-        ],
-    ) * TypeFn.cast_signed(U, K[D.kd, D.kh, D.kw, D.c, D.f])
+    O[D.n, D.od, D.oh, D.ow, D.f] += (
+        TypeFn.cast_signed(
+            U,
+            I[
+                D.n,
+                D.od * S.SD + D.kd * S.DD,
+                D.oh * S.SH + D.kh * S.DH,
+                D.ow * S.SW + D.kw * S.DW,
+                D.c,
+            ],
+        )
+        * TypeFn.cast_signed(U, K[D.kd, D.kh, D.kw, D.c, D.f])
+    )
 
 
 @linalg_structured_op
@@ -1159,16 +1163,19 @@ def conv_3d_ncdhw_fcdhw(
     """
     implements(ConvolutionOpInterface)
     domain(D.n, D.od, D.oh, D.ow, D.f, D.kd, D.kh, D.kw, D.c)
-    O[D.n, D.f, D.od, D.oh, D.ow] += TypeFn.cast_signed(
-        U,
-        I[
-            D.n,
-            D.c,
-            D.od * S.SD + D.kd * S.DD,
-            D.oh * S.SH + D.kh * S.DH,
-            D.ow * S.SW + D.kw * S.DW,
-        ],
-    ) * TypeFn.cast_signed(U, K[D.f, D.c, D.kd, D.kh, D.kw])
+    O[D.n, D.f, D.od, D.oh, D.ow] += (
+        TypeFn.cast_signed(
+            U,
+            I[
+                D.n,
+                D.c,
+                D.od * S.SD + D.kd * S.DD,
+                D.oh * S.SH + D.kh * S.DH,
+                D.ow * S.SW + D.kw * S.DW,
+            ],
+        )
+        * TypeFn.cast_signed(U, K[D.f, D.c, D.kd, D.kh, D.kw])
+    )
 
 
 @linalg_structured_op
@@ -1368,16 +1375,19 @@ def depthwise_conv_3d_ndhwc_dhwc(
     """
     implements(ConvolutionOpInterface)
     domain(D.n, D.od, D.oh, D.ow, D.kd, D.kh, D.kw, D.ic)
-    O[D.n, D.od, D.oh, D.ow, D.ic] += TypeFn.cast_signed(
-        U,
-        I[
-            D.n,
-            D.od * S.SD + D.kd * S.DD,
-            D.oh * S.SH + D.kh * S.DH,
-            D.ow * S.SW + D.kw * S.DW,
-            D.ic,
-        ],
-    ) * TypeFn.cast_signed(U, K[D.kd, D.kh, D.kw, D.ic])
+    O[D.n, D.od, D.oh, D.ow, D.ic] += (
+        TypeFn.cast_signed(
+            U,
+            I[
+                D.n,
+                D.od * S.SD + D.kd * S.DD,
+                D.oh * S.SH + D.kh * S.DH,
+                D.ow * S.SW + D.kw * S.DW,
+                D.ic,
+            ],
+        )
+        * TypeFn.cast_signed(U, K[D.kd, D.kh, D.kw, D.ic])
+    )
 
 
 @linalg_structured_op
@@ -1403,16 +1413,19 @@ def depthwise_conv_3d_ncdhw_cdhw(
     """
     implements(ConvolutionOpInterface)
     domain(D.n, D.od, D.oh, D.ow, D.kd, D.kh, D.kw, D.ic)
-    O[D.n, D.ic, D.od, D.oh, D.ow] += TypeFn.cast_signed(
-        U,
-        I[
-            D.n,
-            D.ic,
-            D.od * S.SD + D.kd * S.DD,
-            D.oh * S.SH + D.kh * S.DH,
-            D.ow * S.SW + D.kw * S.DW,
-        ],
-    ) * TypeFn.cast_signed(U, K[D.ic, D.kd, D.kh, D.kw])
+    O[D.n, D.ic, D.od, D.oh, D.ow] += (
+        TypeFn.cast_signed(
+            U,
+            I[
+                D.n,
+                D.ic,
+                D.od * S.SD + D.kd * S.DD,
+                D.oh * S.SH + D.kh * S.DH,
+                D.ow * S.SW + D.kw * S.DW,
+            ],
+        )
+        * TypeFn.cast_signed(U, K[D.ic, D.kd, D.kh, D.kw])
+    )
 
 
 @linalg_structured_op
@@ -1437,16 +1450,19 @@ def depthwise_conv_3d_ndhwc_dhwcm(
     """
     implements(ConvolutionOpInterface)
     domain(D.n, D.od, D.oh, D.ow, D.cm, D.kd, D.kh, D.kw, D.ic)
-    O[D.n, D.od, D.oh, D.ow, D.ic, D.cm] += TypeFn.cast_signed(
-        U,
-        I[
-            D.n,
-            D.od * S.SD + D.kd * S.DD,
-            D.oh * S.SH + D.kh * S.DH,
-            D.ow * S.SW + D.kw * S.DW,
-            D.ic,
-        ],
-    ) * TypeFn.cast_signed(U, K[D.kd, D.kh, D.kw, D.ic, D.cm])
+    O[D.n, D.od, D.oh, D.ow, D.ic, D.cm] += (
+        TypeFn.cast_signed(
+            U,
+            I[
+                D.n,
+                D.od * S.SD + D.kd * S.DD,
+                D.oh * S.SH + D.kh * S.DH,
+                D.ow * S.SW + D.kw * S.DW,
+                D.ic,
+            ],
+        )
+        * TypeFn.cast_signed(U, K[D.kd, D.kh, D.kw, D.ic, D.cm])
+    )
 
 
 @linalg_structured_op
