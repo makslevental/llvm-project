@@ -55,7 +55,7 @@ static cl::opt<enum PassDebugLevel> PassDebugging(
                clEnumVal(Arguments, "print pass arguments to pass to 'opt'"),
                clEnumVal(Structure, "print pass structure before run()"),
                clEnumVal(Executions, "print pass name before it is executed"),
-               clEnumVal(Details, "print pass details when it is executed")));
+               clEnumVal(Details, "print pass details when it is executed")), cl::init(Disabled));
 
 /// isPassDebuggingExecutionsOrMore - Return true if -debug-pass=Executions
 /// or higher is specified.

@@ -580,6 +580,7 @@ createGCNMaxOccupancyMachineScheduler(MachineSchedContext *C) {
   const GCNSubtarget &ST = C->MF->getSubtarget<GCNSubtarget>();
   ScheduleDAGMILive *DAG =
     new GCNScheduleDAGMILive(C, std::make_unique<GCNMaxOccupancySchedStrategy>(C));
+  // DAG->addMutation(createMaxsMaxsUnpackPackedF32OpsDAGMutation(*DAG));
   DAG->addMutation(createLoadClusterDAGMutation(DAG->TII, DAG->TRI));
   if (ST.shouldClusterStores())
     DAG->addMutation(createStoreClusterDAGMutation(DAG->TII, DAG->TRI));

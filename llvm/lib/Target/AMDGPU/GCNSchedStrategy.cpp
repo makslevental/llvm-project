@@ -520,6 +520,7 @@ GCNMaxOccupancySchedStrategy::GCNMaxOccupancySchedStrategy(
     const MachineSchedContext *C, bool IsLegacyScheduler)
     : GCNSchedStrategy(C) {
   SchedStages.push_back(GCNSchedStageID::OccInitialSchedule);
+  SchedStages.push_back(GCNSchedStageID::MaxsUnpackPackedF32OpsSchedule);
   SchedStages.push_back(GCNSchedStageID::UnclusteredHighRPReschedule);
   SchedStages.push_back(GCNSchedStageID::ClusteredLowOccupancyReschedule);
   SchedStages.push_back(GCNSchedStageID::PreRARematerialize);
@@ -783,6 +784,9 @@ GCNScheduleDAGMILive::createSchedStage(GCNSchedStageID SchedStageID) {
   case GCNSchedStageID::MemoryClauseInitialSchedule:
     return std::make_unique<MemoryClauseInitialScheduleStage>(SchedStageID,
                                                               *this);
+  case GCNSchedStageID::MaxsUnpackPackedF32OpsSchedule:
+    return std::make_unique<MaxsUnpackPackedF32OpsScheduleStage>(SchedStageID,
+                                                                 *this);
   }
 
   llvm_unreachable("Unknown SchedStageID.");
@@ -1130,6 +1134,31 @@ void UnclusteredHighRPStage::finalizeGCNSchedStage() {
   GCNSchedStage::finalizeGCNSchedStage();
 }
 
+struct MaxsUnpackPackedF32OpsDAGMutation : ScheduleDAGMutation {
+  GCNScheduleDAGMILive &DAG;
+
+  MaxsUnpackPackedF32OpsDAGMutation(GCNScheduleDAGMILive &DAG) : DAG(DAG) {}
+
+  void apply(ScheduleDAGInstrs *DAG) override {
+    const TargetInstrInfo &TII = *DAG->TII;
+    const GCNSubtarget &ST = DAG->MF.getSubtarget<GCNSubtarget>();
+    LLVM_DEBUG(dbgs() << "Completed MaxsUnpackPackedF32OpsDAGMutation\n");
+  }
+};
+
+namespace llvm {
+std::unique_ptr<ScheduleDAGMutation>
+createMaxsUnpackPackedF32OpsDAGMutation(GCNScheduleDAGMILive &DAG) {
+  return std::make_unique<MaxsUnpackPackedF32OpsDAGMutation>(DAG);
+}
+
+std::unique_ptr<ScheduleDAGMutation>
+createMaxsUnpackPackedF32OpsDAGMutation(ScheduleDAGMILive &DAG) {
+  return std::make_unique<MaxsUnpackPackedF32OpsDAGMutation>(reinterpret_cast<GCNScheduleDAGMILive &>(DAG));
+}
+
+}
+
 bool GCNSchedStage::initGCNRegion() {
   // Check whether this new region is also a new block.
   if (DAG.RegionBegin->getParent() != CurrentMBB)
@@ -1187,6 +1216,11 @@ bool GCNSchedStage::initGCNRegion() {
     DAG.addMutation(createIGroupLPDAGMutation(
         IsInitialStage ? AMDGPU::SchedulingPhase::Initial
                        : AMDGPU::SchedulingPhase::PreRAReentry));
+  }
+
+  if (StageID == GCNSchedStageID::MaxsUnpackPackedF32OpsSchedule) {
+    DAG.addMutation(createMaxsUnpackPackedF32OpsDAGMutation(DAG));
+    return true;
   }
 
   return true;
@@ -1546,6 +1580,11 @@ bool ILPInitialScheduleStage::shouldRevertScheduling(unsigned WavesAfter) {
 bool MemoryClauseInitialScheduleStage::shouldRevertScheduling(
     unsigned WavesAfter) {
   return mayCauseSpilling(WavesAfter);
+}
+
+bool MaxsUnpackPackedF32OpsScheduleStage::shouldRevertScheduling(
+    unsigned WavesAfter) {
+  return false;
 }
 
 bool GCNSchedStage::mayCauseSpilling(unsigned WavesAfter) {

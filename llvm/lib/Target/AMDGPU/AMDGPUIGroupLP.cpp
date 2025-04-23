@@ -736,7 +736,7 @@ public:
 
   MaxsOpt(ScheduleDAGInstrs *DAG, const SIInstrInfo *TII)
       : IGLPStrategy(DAG, TII) {
-    IsBottomUp = true;
+    IsBottomUp = false;
   }
 };
 

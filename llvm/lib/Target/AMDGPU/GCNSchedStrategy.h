@@ -30,7 +30,8 @@ enum class GCNSchedStageID : unsigned {
   ClusteredLowOccupancyReschedule = 2,
   PreRARematerialize = 3,
   ILPInitialSchedule = 4,
-  MemoryClauseInitialSchedule = 5
+  MemoryClauseInitialSchedule = 5,
+  MaxsUnpackPackedF32OpsSchedule = 6
 };
 
 #ifndef NDEBUG
@@ -489,6 +490,20 @@ public:
                                    GCNScheduleDAGMILive &DAG)
       : GCNSchedStage(StageID, DAG) {}
 };
+
+class MaxsUnpackPackedF32OpsScheduleStage : public GCNSchedStage {
+public:
+  bool shouldRevertScheduling(unsigned WavesAfter) override;
+
+  MaxsUnpackPackedF32OpsScheduleStage(GCNSchedStageID StageID,
+                                      GCNScheduleDAGMILive &DAG)
+      : GCNSchedStage(StageID, DAG) {}
+};
+
+std::unique_ptr<ScheduleDAGMutation>
+createMaxsMaxsUnpackPackedF32OpsDAGMutation(GCNScheduleDAGMILive &DAG);
+std::unique_ptr<ScheduleDAGMutation>
+createMaxsMaxsUnpackPackedF32OpsDAGMutation(ScheduleDAGMILive &DAG);
 
 class GCNPostScheduleDAGMILive final : public ScheduleDAGMI {
 private:
