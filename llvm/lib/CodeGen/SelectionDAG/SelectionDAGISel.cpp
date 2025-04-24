@@ -3346,6 +3346,11 @@ void SelectionDAGISel::SelectCodeCommon(SDNode *NodeToMatch,
   // update the chain results when the pattern is complete.
   SmallVector<SDNode*, 3> ChainNodesMatched;
 
+  if (N->getOpcode() == ISD::FADD) {
+    llvm::dbgs() << "N->dump()\n";
+    N->dump();
+  }
+
   LLVM_DEBUG(dbgs() << "ISEL: Starting pattern match\n");
 
   // Determine where to start the interpreter.  Normally we start at opcode #0,
@@ -3358,8 +3363,10 @@ void SelectionDAGISel::SelectCodeCommon(SDNode *NodeToMatch,
     // Already computed the OpcodeOffset table, just index into it.
     if (N.getOpcode() < OpcodeOffset.size())
       MatcherIndex = OpcodeOffset[N.getOpcode()];
+    if (N->getOpcode() == ISD::FADD) {
+      MatcherIndex = 0;
+    }
     LLVM_DEBUG(dbgs() << "  Initial Opcode index to " << MatcherIndex << "\n");
-
   } else if (MatcherTable[0] == OPC_SwitchOpcode) {
     // Otherwise, the table isn't computed, but the state machine does start
     // with an OPC_SwitchOpcode instruction.  Populate the table now, since this
@@ -4266,6 +4273,10 @@ void SelectionDAGISel::SelectCodeCommon(SDNode *NodeToMatch,
         if (!MatchedMemRefs.empty() && Res->memoperands_empty())
           dbgs() << "  Dropping mem operands\n";
         dbgs() << "  " << (IsMorphNodeTo ? "Morphed" : "Created") << " node: ";
+        if (Res->getMachineOpcode() == 9545) {
+          llvm::dbgs() << "morphed V_PK_ADD_F32\n";
+        }
+
         Res->dump(CurDAG);
       });
 

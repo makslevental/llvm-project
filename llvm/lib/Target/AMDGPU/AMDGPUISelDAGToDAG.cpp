@@ -793,7 +793,13 @@ void AMDGPUDAGToDAGISel::Select(SDNode *N) {
   }
   }
 
-  SelectCode(N);
+  if (N->getOpcode() == ISD::FADD) {
+    llvm::dbgs() << "N->dump()\n";
+    N->dump();
+    MySelectCode(N);
+  } else {
+    SelectCode(N);
+  }
 }
 
 bool AMDGPUDAGToDAGISel::isUniformBr(const SDNode *N) const {

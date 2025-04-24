@@ -1142,7 +1142,12 @@ struct MaxsUnpackPackedF32OpsDAGMutation : ScheduleDAGMutation {
   void apply(ScheduleDAGInstrs *DAG) override {
     const TargetInstrInfo &TII = *DAG->TII;
     const GCNSubtarget &ST = DAG->MF.getSubtarget<GCNSubtarget>();
-    LLVM_DEBUG(dbgs() << "Completed MaxsUnpackPackedF32OpsDAGMutation\n");
+    for (auto &I : *DAG) {
+      if (I.getOpcode() == AMDGPU::V_PK_ADD_F32)
+        I.dump();
+      I.dump();
+    }
+    llvm::dbgs() << "Completed MaxsUnpackPackedF32OpsDAGMutation\n";
   }
 };
 
