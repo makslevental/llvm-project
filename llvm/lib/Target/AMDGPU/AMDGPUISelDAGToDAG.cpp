@@ -793,7 +793,7 @@ void AMDGPUDAGToDAGISel::Select(SDNode *N) {
   }
   }
 
-  if (N->getOpcode() == ISD::FADD) {
+  if (N->getOpcode() == ISD::FADD && false) {
     llvm::dbgs() << "N->dump()\n";
     N->dump();
     MySelectCode(N);
@@ -1715,6 +1715,11 @@ bool AMDGPUDAGToDAGISel::SelectBUFSOffset(SDValue ByteOffsetNode,
 
   SOffset = ByteOffsetNode;
   return true;
+}
+
+bool AMDGPUDAGToDAGISel::MaxsComplexPatternPackedFP(SDNode *N) const {
+  N->dump();
+  return false;
 }
 
 // Find a load or store from corresponding pattern root.
