@@ -1143,8 +1143,9 @@ struct MaxsUnpackPackedF32OpsDAGMutation : ScheduleDAGMutation {
     const TargetInstrInfo &TII = *DAG->TII;
     const GCNSubtarget &ST = DAG->MF.getSubtarget<GCNSubtarget>();
     for (auto &I : *DAG) {
-      if (I.getOpcode() == AMDGPU::V_PK_ADD_F32)
+      if (I.getOpcode() == AMDGPU::V_PK_ADD_F32) {
         I.dump();
+      }
       I.dump();
     }
     llvm::dbgs() << "Completed MaxsUnpackPackedF32OpsDAGMutation\n";

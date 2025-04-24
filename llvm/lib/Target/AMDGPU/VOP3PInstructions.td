@@ -1153,7 +1153,7 @@ let isCommutable = 1, isReMaterializable = 1 in {
   let SubtargetPredicate = HasPackedFP32Ops in {
     defm V_PK_FMA_F32 : VOP3PInst<"v_pk_fma_f32", VOP3P_Profile<VOP_V2F32_V2F32_V2F32_V2F32, VOP3_PACKED>, any_fma>;
     defm V_PK_MUL_F32 : VOP3PInst<"v_pk_mul_f32", VOP3P_Profile<VOP_V2F32_V2F32_V2F32, VOP3_PACKED>, any_fmul>;
-    defm V_PK_ADD_F32 : VOP3PInst<"v_pk_add_f32", VOP3P_Profile<VOP_V2F32_V2F32_V2F32, VOP3_PACKED>, my_any_fadd>;
+    defm V_PK_ADD_F32 : VOP3PInst<"v_pk_add_f32", VOP3P_Profile<VOP_V2F32_V2F32_V2F32, VOP3_PACKED>, any_fadd>;
   } // End SubtargetPredicate = HasPackedFP32Ops
 
   let SubtargetPredicate = HasPkMovB32, isAsCheapAsAMove = 1 in

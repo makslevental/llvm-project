@@ -3363,9 +3363,9 @@ void SelectionDAGISel::SelectCodeCommon(SDNode *NodeToMatch,
     // Already computed the OpcodeOffset table, just index into it.
     if (N.getOpcode() < OpcodeOffset.size())
       MatcherIndex = OpcodeOffset[N.getOpcode()];
-    if (N->getOpcode() == ISD::FADD) {
-      MatcherIndex = 0;
-    }
+    // if (N->getOpcode() == ISD::FADD) {
+    //   MatcherIndex = 0;
+    // }
     LLVM_DEBUG(dbgs() << "  Initial Opcode index to " << MatcherIndex << "\n");
   } else if (MatcherTable[0] == OPC_SwitchOpcode) {
     // Otherwise, the table isn't computed, but the state machine does start
