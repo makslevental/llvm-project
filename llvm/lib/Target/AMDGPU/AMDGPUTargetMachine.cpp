@@ -1545,6 +1545,8 @@ void GCNPassConfig::addOptimizedRegAlloc() {
   if (TM->getOptLevel() > CodeGenOptLevel::Less)
     insertPass(&MachineSchedulerID, &SIFormMemoryClausesID);
 
+  addPass(&MaxsMachineFunctionID);
+
   TargetPassConfig::addOptimizedRegAlloc();
 }
 

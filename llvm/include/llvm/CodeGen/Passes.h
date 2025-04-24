@@ -153,6 +153,7 @@ namespace llvm {
 
   /// ProcessImpicitDefs pass - This pass removes IMPLICIT_DEFs.
   extern char &ProcessImplicitDefsID;
+  extern char &MaxsMachineFunctionID;
 
   /// RegisterCoalescer - This pass merges live ranges to eliminate copies.
   extern char &RegisterCoalescerID;
