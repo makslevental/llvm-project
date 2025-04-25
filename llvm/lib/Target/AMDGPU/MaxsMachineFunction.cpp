@@ -29,7 +29,7 @@ struct MaxsMachineFunction : MachineFunctionPass {
   static char ID;
 
   MaxsMachineFunction() : MachineFunctionPass(ID) {
-    initializeMaxsMachineFunctionPass(*PassRegistry::getPassRegistry());
+    // initializeMaxsMachineFunctionPass(*PassRegistry::getPassRegistry());
   }
 
   void getAnalysisUsage(AnalysisUsage &au) const override;
@@ -44,10 +44,26 @@ struct MaxsMachineFunction : MachineFunctionPass {
 } // end anonymous namespace
 
 char MaxsMachineFunction::ID = 0;
-char &llvm::MaxsMachineFunctionID = MaxsMachineFunction::ID;
+// char &llvm::MaxsMachineFunctionID = MaxsMachineFunction::ID;
 
-INITIALIZE_PASS(MaxsMachineFunction, DEBUG_TYPE, "MaxsMachineFunction", false,
-                false)
+// static void initializeMaxsMachineFunctionPassOnce(PassRegistry &Registry) {
+//   PassInfo *PI = new PassInfo(
+//       "MaxsMachineFunction", "maxsmachinefunction", &MaxsMachineFunction::ID,
+//       PassInfo::NormalCtor_t(callDefaultCtor<MaxsMachineFunction>), false,
+//       false);
+//   Registry.registerPass(*PI, true);
+// }
+//
+// static llvm::once_flag InitializeMaxsMachineFunctionPassFlag;
+//
+// void llvm::initializeMaxsMachineFunctionPass(PassRegistry &Registry) {
+//   llvm::call_once(InitializeMaxsMachineFunctionPassFlag,
+//                   initializeMaxsMachineFunctionPassOnce, std::ref(Registry));
+// }
+
+FunctionPass *createMaxsMachineFunctionPass() {
+  return new MaxsMachineFunction();
+}
 
 void MaxsMachineFunction::getAnalysisUsage(AnalysisUsage &AU) const {
   AU.setPreservesCFG();
