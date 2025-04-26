@@ -1,5 +1,7 @@
-; /home/mlevental/dev_projects/llvm-project/llvm/lib/Target/AMDGPU/test_v_pk.ll  -mtriple=amdgcn -mcpu=gfx942 -o -
-; /home/mlevental/dev_projects/llvm-project/llvm/lib/Target/AMDGPU/test_v_pk.ll  -mattr=-packed-fp32-ops -mtriple=amdgcn -mcpu=gfx942 -o -
+; test_v_pk.ll -mtriple=amdgcn -mcpu=gfx942 -o -
+; test_v_pk.ll -mattr=-packed-fp32-ops -mtriple=amdgcn -mcpu=gfx942 -o -
+; test_v_pk.ll -mtriple=amdgcn -mcpu=gfx942 -stop-after=finalize-isel -o -
+; test_v_pk.mir -mtriple=amdgcn -mcpu=gfx942 -x mir -filetype=null -o -
 
 ; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: readwrite)
 define amdgpu_kernel void @add_kernel(ptr addrspace(1) nocapture readonly %0, ptr addrspace(1) nocapture readonly %1, ptr addrspace(1) nocapture writeonly %2, i32 %3) local_unnamed_addr #0 {
