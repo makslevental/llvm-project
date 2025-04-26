@@ -1144,16 +1144,20 @@ def MAIInstInfoTable : GenericTable {
   let PrimaryKeyName = "getMAIInstInfoHelper";
 }
 
+// this still doesn't work because
+// SubtargetPredicate = HasPackedFP32Ops
+// doesn't just determine selection it determines type legalization etc too
+// (general spaghetti)
 def my_any_fadd : PatFrags<(ops node:$lhs, node:$rhs),
                               [(strict_fadd node:$lhs, node:$rhs), (fadd node:$lhs, node:$rhs)]> {
-    let PredicateCode = [{ return MaxsComplexPatternPackedFP(N); }];
+    let PredicateCode = [{ return MaxsComplexPatternPackedFP(N, CurDAG); }];
 }
 
 let isCommutable = 1, isReMaterializable = 1 in {
   let SubtargetPredicate = HasPackedFP32Ops in {
     defm V_PK_FMA_F32 : VOP3PInst<"v_pk_fma_f32", VOP3P_Profile<VOP_V2F32_V2F32_V2F32_V2F32, VOP3_PACKED>, any_fma>;
     defm V_PK_MUL_F32 : VOP3PInst<"v_pk_mul_f32", VOP3P_Profile<VOP_V2F32_V2F32_V2F32, VOP3_PACKED>, any_fmul>;
-    defm V_PK_ADD_F32 : VOP3PInst<"v_pk_add_f32", VOP3P_Profile<VOP_V2F32_V2F32_V2F32, VOP3_PACKED>, any_fadd>;
+    defm V_PK_ADD_F32 : VOP3PInst<"v_pk_add_f32", VOP3P_Profile<VOP_V2F32_V2F32_V2F32, VOP3_PACKED>, my_any_fadd>;
   } // End SubtargetPredicate = HasPackedFP32Ops
 
   let SubtargetPredicate = HasPkMovB32, isAsCheapAsAMove = 1 in

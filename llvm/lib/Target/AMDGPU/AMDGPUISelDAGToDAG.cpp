@@ -1717,7 +1717,7 @@ bool AMDGPUDAGToDAGISel::SelectBUFSOffset(SDValue ByteOffsetNode,
   return true;
 }
 
-bool AMDGPUDAGToDAGISel::MaxsComplexPatternPackedFP(SDNode *N) const {
+bool AMDGPUDAGToDAGISel::MaxsComplexPatternPackedFP(SDNode *N, SelectionDAG *CurDAG) const {
   N->dump();
   return false;
 }
