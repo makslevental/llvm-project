@@ -25,6 +25,9 @@ using namespace llvm;
 
 namespace {
 
+cl::opt<bool> UnpackFOps("amdgpu-unpack-fops", cl::Hidden,
+                         cl::desc("unpack f ops"), cl::init(false));
+
 struct MaxsMachineFunction : MachineFunctionPass {
   static char ID;
 
@@ -98,6 +101,8 @@ bool MaxsMachineFunction::runOnMachineFunction(MachineFunction &MF) {
                     << "********** Function: " << MF.getName() << '\n');
 
   bool Changed = false;
+  if (!UnpackFOps)
+    return Changed;
 
   MachineRegisterInfo *MRI = &MF.getRegInfo();
   const GCNSubtarget &ST = MF.getSubtarget<GCNSubtarget>();
@@ -172,10 +177,14 @@ bool MaxsMachineFunction::runOnMachineFunction(MachineFunction &MF) {
 
         toRemove.push_back(&MI);
         Changed = true;
+      } else if (MI.getOpcode() == AMDGPU::V_PK_MUL_F32) {
+        MI.dump();
       }
     }
   }
   for (auto remove : toRemove)
     remove->eraseFromParent();
+  if (Changed)
+    MF.dump();
   return Changed;
 }
