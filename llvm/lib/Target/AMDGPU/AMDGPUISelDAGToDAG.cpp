@@ -793,7 +793,7 @@ void AMDGPUDAGToDAGISel::Select(SDNode *N) {
   }
   }
 
-  if (N->getOpcode() == ISD::FADD && false) {
+  if (N->getOpcode() == ISD::FADD) {
     llvm::dbgs() << "N->dump()\n";
     N->dump();
     MySelectCode(N);
@@ -1717,7 +1717,7 @@ bool AMDGPUDAGToDAGISel::SelectBUFSOffset(SDValue ByteOffsetNode,
   return true;
 }
 
-bool AMDGPUDAGToDAGISel::MaxsComplexPatternPackedFP(SDNode *N) const {
+bool AMDGPUDAGToDAGISel::MaxsComplexPatternPackedFP(SDNode *N, SelectionDAG *CurDAG) const {
   N->dump();
   return false;
 }

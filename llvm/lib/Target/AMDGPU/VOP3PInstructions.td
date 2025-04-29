@@ -1144,9 +1144,13 @@ def MAIInstInfoTable : GenericTable {
   let PrimaryKeyName = "getMAIInstInfoHelper";
 }
 
+// this still doesn't work because
+// SubtargetPredicate = HasPackedFP32Ops
+// doesn't just determine selection it determines type legalization etc too
+// (general spaghetti)
 def my_any_fadd : PatFrags<(ops node:$lhs, node:$rhs),
                               [(strict_fadd node:$lhs, node:$rhs), (fadd node:$lhs, node:$rhs)]> {
-    let PredicateCode = [{ return MaxsComplexPatternPackedFP(N); }];
+    let PredicateCode = [{ return MaxsComplexPatternPackedFP(N, CurDAG); }];
 }
 
 let isCommutable = 1, isReMaterializable = 1 in {
