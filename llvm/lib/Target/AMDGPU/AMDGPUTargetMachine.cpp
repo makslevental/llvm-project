@@ -1505,6 +1505,8 @@ void GCNPassConfig::addFastRegAlloc() {
   TargetPassConfig::addFastRegAlloc();
 }
 
+extern FunctionPass *createMaxsMachineFunctionPass();
+
 void GCNPassConfig::addOptimizedRegAlloc() {
   if (EnableDCEInRA)
     insertPass(&DetectDeadLanesID, &DeadMachineInstructionElimID);
@@ -1538,6 +1540,8 @@ void GCNPassConfig::addOptimizedRegAlloc() {
   // compilation time, so we only enable it from O2.
   if (TM->getOptLevel() > CodeGenOptLevel::Less)
     insertPass(&MachineSchedulerID, &SIFormMemoryClausesID);
+
+  addPass(createMaxsMachineFunctionPass());
 
   TargetPassConfig::addOptimizedRegAlloc();
 }

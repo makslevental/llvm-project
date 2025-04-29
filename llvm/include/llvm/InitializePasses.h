@@ -247,6 +247,7 @@ void initializePreISelIntrinsicLoweringLegacyPassPass(PassRegistry &);
 void initializePrintFunctionPassWrapperPass(PassRegistry &);
 void initializePrintModulePassWrapperPass(PassRegistry &);
 void initializeProcessImplicitDefsPass(PassRegistry &);
+void initializeMaxsMachineFunctionPass(PassRegistry &);
 void initializeProfileSummaryInfoWrapperPassPass(PassRegistry &);
 void initializePromoteLegacyPassPass(PassRegistry &);
 void initializeRABasicPass(PassRegistry &);
