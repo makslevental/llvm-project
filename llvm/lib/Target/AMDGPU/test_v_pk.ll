@@ -22,7 +22,7 @@ define amdgpu_kernel void @add_kernel(ptr addrspace(1) nocapture readonly %0, pt
   %18 = load float, ptr %17, align 16
   %19 = getelementptr inbounds i8, ptr %17, i64 4
   %20 = load float, ptr %19, align 4
-  
+
   %v_100 = insertelement <2 x float> undef, float %18, i32 0
   %v_102 = insertelement <2 x float> %v_100, float %20, i32 1
 
@@ -30,10 +30,10 @@ define amdgpu_kernel void @add_kernel(ptr addrspace(1) nocapture readonly %0, pt
   %22 = load float, ptr %21, align 8
   %23 = getelementptr inbounds i8, ptr %17, i64 12
   %24 = load float, ptr %23, align 4
-  
+
   %v_200 = insertelement <2 x float> undef, float %22, i32 0
-  %v_202 = insertelement <2 x float> %v_200, float %24, i32 1  
-  
+  %v_202 = insertelement <2 x float> %v_200, float %24, i32 1
+
   %25 = getelementptr float, ptr addrspace(1) %1, i64 %15
   %26 = addrspacecast ptr addrspace(1) %25 to ptr
   %27 = sext i32 %12 to i64
@@ -47,23 +47,23 @@ define amdgpu_kernel void @add_kernel(ptr addrspace(1) nocapture readonly %0, pt
 
   %36 = getelementptr inbounds i8, ptr %26, i64 8
   %37 = load float, ptr %36, align 8
-  
+
   %v_300 = insertelement <2 x float> undef, float %34, i32 0
-  %v_302 = insertelement <2 x float> %v_300, float %37, i32 1  
-  
+  %v_302 = insertelement <2 x float> %v_300, float %37, i32 1
+
   %39 = getelementptr inbounds i8, ptr %26, i64 4
   %40 = load float, ptr %39, align 4
   %42 = load float, ptr %26, align 16
 
   %v_400 = insertelement <2 x float> undef, float %40, i32 0
-  %v_402 = insertelement <2 x float> %v_400, float %42, i32 1  
+  %v_402 = insertelement <2 x float> %v_400, float %42, i32 1
 
   %v_500 = fadd <2 x float> %v_102, %v_402
-  %v_501 = fadd <2 x float> %v_202, %v_302
+  ; %v_501 = fadd <2 x float> %v_202, %v_302
   ; tail call void @llvm.amdgcn.iglp.opt(i32 4)
 
-  %v_45 = extractelement <2 x float> %v_501, i32 1
-  %v_32 = extractelement <2 x float> %v_501, i32 0
+  ; %v_45 = extractelement <2 x float> %v_501, i32 1
+  ; %v_32 = extractelement <2 x float> %v_501, i32 0
   %v_30 = extractelement <2 x float> %v_500, i32 1
   %v_28 = extractelement <2 x float> %v_500, i32 0
 
@@ -71,9 +71,9 @@ define amdgpu_kernel void @add_kernel(ptr addrspace(1) nocapture readonly %0, pt
   %p_45 = getelementptr float, ptr addrspace(1) %2, i64 %i_44
   store float %v_28, ptr addrspace(1) %p_45, align 4
 
-  %i_31 = sext i32 %14 to i64
-  %p_32 = getelementptr float, ptr addrspace(1) %2, i64 %i_31
-  store float %v_32, ptr addrspace(1) %p_32, align 4
+  ; %i_31 = sext i32 %14 to i64
+  ; %p_32 = getelementptr float, ptr addrspace(1) %2, i64 %i_31
+  ; store float %v_32, ptr addrspace(1) %p_32, align 4
 
   %i_29 = sext i32 %13 to i64
   %p_30 = getelementptr float, ptr addrspace(1) %2, i64 %i_29

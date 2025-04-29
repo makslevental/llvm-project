@@ -290,7 +290,7 @@ void MySelectCode(SDNode *N) {
   #define TARGET_VAL(X) X & 255, unsigned(X) >> 8
   #define COVERAGE_IDX_VAL(X) X & 255, (unsigned(X) >> 8) & 255, (unsigned(X) >> 16) & 255, (unsigned(X) >> 24) & 255
   static const unsigned char MatcherTable[] = {
-// /*528829*/ /*SwitchOpcode*/ 118|128,4/*630*/, TARGET_VAL(ISD::FADD),// ->529463
+// /*528829*/ /*SwitchOpcode*/ 120|128,4/*632*/, TARGET_VAL(ISD::FADD),// ->529465
 /*528833*/  OPC_Scope, 76, /*->528911*/ // 4 children in Scope
 /*528835*/   OPC_MoveChild0,
 /*528836*/   OPC_CheckOpcode, TARGET_VAL(ISD::INTRINSIC_WO_CHAIN),
@@ -393,7 +393,7 @@ void MySelectCode(SDNode *N) {
               // Src: (fadd:{ *:[f32] } (AMDGPUfmul_legacy_impl:{ *:[f32] } (VOP3Mods:{ *:[f32] } f32:{ *:[f32] }:$src0, i32:{ *:[i32] }:$src0_mod), (VOP3Mods:{ *:[f32] } f32:{ *:[f32] }:$src1, i32:{ *:[i32] }:$src1_mod)), (VOP3Mods:{ *:[f32] } f32:{ *:[f32] }:$src2, i32:{ *:[i32] }:$src2_mod)) - Complexity = 33
               // Dst: (V_MAD_LEGACY_F32_e64:{ *:[f32] } ?:{ *:[i32] }:$src0_mod, ?:{ *:[f32] }:$src0, ?:{ *:[i32] }:$src1_mod, ?:{ *:[f32] }:$src1, ?:{ *:[i32] }:$src2_mod, ?:{ *:[f32] }:$src2, 0:{ *:[i1] }, 0:{ *:[i32] })
 /*529063*/   0, /*End of Scope*/
-/*529064*/  /*Scope*/ 12|128,3/*396*/, /*->529462*/
+/*529064*/  /*Scope*/ 14|128,3/*398*/, /*->529464*/
 /*529066*/   OPC_RecordChild0, // #0 = $VOP3NoMods:src2
 /*529067*/   OPC_Scope, 74, /*->529143*/ // 2 children in Scope
 /*529069*/    OPC_MoveChild1,
@@ -428,7 +428,7 @@ void MySelectCode(SDNode *N) {
                // Src: (fadd:{ *:[f32] } (VOP3Mods:{ *:[f32] } f32:{ *:[f32] }:$src2, i32:{ *:[i32] }:$src2_mod), (AMDGPUfmul_legacy_impl:{ *:[f32] } (VOP3Mods:{ *:[f32] } f32:{ *:[f32] }:$src0, i32:{ *:[i32] }:$src0_mod), (VOP3Mods:{ *:[f32] } f32:{ *:[f32] }:$src1, i32:{ *:[i32] }:$src1_mod))) - Complexity = 33
                // Dst: (V_MAD_LEGACY_F32_e64:{ *:[f32] } ?:{ *:[i32] }:$src0_mod, ?:{ *:[f32] }:$src0, ?:{ *:[i32] }:$src1_mod, ?:{ *:[f32] }:$src1, ?:{ *:[i32] }:$src2_mod, ?:{ *:[f32] }:$src2, 0:{ *:[i1] }, 0:{ *:[i32] })
 /*529142*/    0, /*End of Scope*/
-/*529143*/   /*Scope*/ 60|128,2/*316*/, /*->529461*/
+/*529143*/   /*Scope*/ 62|128,2/*318*/, /*->529463*/
 /*529145*/    OPC_RecordChild1, // #1 = $src1
 /*529146*/    OPC_Scope, 25, /*->529173*/ // 6 children in Scope
 /*529148*/     OPC_CheckPredicate3,  // Predicate_anonymous_13768
@@ -543,36 +543,37 @@ void MySelectCode(SDNode *N) {
                 // Src: (fadd:{ *:[f64] } (VOP3Mods:{ *:[f64] } f64:{ *:[f64] }:$src1, i32:{ *:[i32] }:$src1_modifiers), (VOP3Mods0:{ *:[f64] } f64:{ *:[f64] }:$src0, i32:{ *:[i32] }:$src0_modifiers, i1:{ *:[i1] }:$clamp, i32:{ *:[i32] }:$omod)) - Complexity = -973
                 // Dst: (V_ADD_F64_e64:{ *:[f64] } i32:{ *:[i32] }:$src0_modifiers, f64:{ *:[f64] }:$src0, i32:{ *:[i32] }:$src1_modifiers, f64:{ *:[f64] }:$src1, i1:{ *:[i1] }:$clamp, i32:{ *:[i32] }:$omod)
 /*529389*/     0, /*End of Scope*/
-/*529390*/    /*Scope*/ 33, /*->529424*/
-/*529391*/     OPC_CheckType, /*MVT::v2f16*/89,
-/*529393*/     OPC_CheckComplexPat, /*CP*/13, /*#*/0, // SelectVOP3PMods:$ #2 #3
-/*529396*/     OPC_CheckComplexPat, /*CP*/13, /*#*/1, // SelectVOP3PMods:$ #4 #5
-/*529399*/     OPC_EmitInteger, /*MVT::i1*/2, 0,  // 0 #6
-/*529402*/     OPC_EmitInteger32, 0,  // 0 #7
-/*529404*/     OPC_EmitInteger32, 0,  // 0 #8
-/*529406*/     OPC_EmitInteger32, 0,  // 0 #9
-/*529408*/     OPC_EmitInteger32, 0,  // 0 #10
-/*529410*/     OPC_MorphNodeTo1None, TARGET_VAL(AMDGPU::V_PK_ADD_F16),
+/*529390*/    /*Scope*/ 37, /*->529428*/
+/*529391*/     OPC_CheckType, /*MVT::v2f32*/109,
+/*529393*/     OPC_CheckPredicate, 108, // Predicate_my_any_fadd
+/*529395*/     OPC_CheckPatternPredicate, 104, // (Subtarget->hasPackedFP32Ops())
+/*529397*/     OPC_CheckComplexPat, /*CP*/13, /*#*/0, // SelectVOP3PMods:$ #2 #3
+/*529400*/     OPC_CheckComplexPat, /*CP*/13, /*#*/1, // SelectVOP3PMods:$ #4 #5
+/*529403*/     OPC_EmitInteger, /*MVT::i1*/2, 0,  // 0 #6
+/*529406*/     OPC_EmitInteger32, 0,  // 0 #7
+/*529408*/     OPC_EmitInteger32, 0,  // 0 #8
+/*529410*/     OPC_EmitInteger32, 0,  // 0 #9
+/*529412*/     OPC_EmitInteger32, 0,  // 0 #10
+/*529414*/     OPC_MorphNodeTo1None, TARGET_VAL(AMDGPU::V_PK_ADD_F32),
+                   /*MVT::v2f32*/109, 9/*#Ops*/, 3, 2, 5, 4, 6, 7, 8, 9, 10,
+               // Src: (fadd:{ *:[v2f32] } (VOP3PMods:{ *:[v2f32] } v2f32:{ *:[v2f32] }:$src0, i32:{ *:[i32] }:$src0_modifiers), (VOP3PMods:{ *:[v2f32] } v2f32:{ *:[v2f32] }:$src1, i32:{ *:[i32] }:$src1_modifiers))<<P:Predicate_my_any_fadd>> - Complexity = -978
+               // Dst: (V_PK_ADD_F32:{ *:[v2f32] } i32:{ *:[i32] }:$src0_modifiers, v2f32:{ *:[v2f32] }:$src0, i32:{ *:[i32] }:$src1_modifiers, v2f32:{ *:[v2f32] }:$src1)
+/*529428*/    /*Scope*/ 33, /*->529462*/
+/*529429*/     OPC_CheckType, /*MVT::v2f16*/89,
+/*529431*/     OPC_CheckComplexPat, /*CP*/13, /*#*/0, // SelectVOP3PMods:$ #2 #3
+/*529434*/     OPC_CheckComplexPat, /*CP*/13, /*#*/1, // SelectVOP3PMods:$ #4 #5
+/*529437*/     OPC_EmitInteger, /*MVT::i1*/2, 0,  // 0 #6
+/*529440*/     OPC_EmitInteger32, 0,  // 0 #7
+/*529442*/     OPC_EmitInteger32, 0,  // 0 #8
+/*529444*/     OPC_EmitInteger32, 0,  // 0 #9
+/*529446*/     OPC_EmitInteger32, 0,  // 0 #10
+/*529448*/     OPC_MorphNodeTo1None, TARGET_VAL(AMDGPU::V_PK_ADD_F16),
                    /*MVT::v2f16*/89, 9/*#Ops*/, 3, 2, 5, 4, 6, 7, 8, 9, 10,
                // Src: (fadd:{ *:[v2f16] } (VOP3PMods:{ *:[v2f16] } v2f16:{ *:[v2f16] }:$src0, i32:{ *:[i32] }:$src0_modifiers), (VOP3PMods:{ *:[v2f16] } v2f16:{ *:[v2f16] }:$src1, i32:{ *:[i32] }:$src1_modifiers)) - Complexity = -979
                // Dst: (V_PK_ADD_F16:{ *:[v2f16] } i32:{ *:[i32] }:$src0_modifiers, v2f16:{ *:[v2f16] }:$src0, i32:{ *:[i32] }:$src1_modifiers, v2f16:{ *:[v2f16] }:$src1)
-/*529424*/    /*Scope*/ 35, /*->529460*/
-/*529425*/     OPC_CheckType, /*MVT::v2f32*/109,
-/*529427*/     OPC_CheckPatternPredicate, 104, // (Subtarget->hasPackedFP32Ops())
-/*529429*/     OPC_CheckComplexPat, /*CP*/13, /*#*/0, // SelectVOP3PMods:$ #2 #3
-/*529432*/     OPC_CheckComplexPat, /*CP*/13, /*#*/1, // SelectVOP3PMods:$ #4 #5
-/*529435*/     OPC_EmitInteger, /*MVT::i1*/2, 0,  // 0 #6
-/*529438*/     OPC_EmitInteger32, 0,  // 0 #7
-/*529440*/     OPC_EmitInteger32, 0,  // 0 #8
-/*529442*/     OPC_EmitInteger32, 0,  // 0 #9
-/*529444*/     OPC_EmitInteger32, 0,  // 0 #10
-/*529446*/     OPC_MorphNodeTo1None, TARGET_VAL(AMDGPU::V_PK_ADD_F32),
-                   /*MVT::v2f32*/109, 9/*#Ops*/, 3, 2, 5, 4, 6, 7, 8, 9, 10,
-               // Src: (fadd:{ *:[v2f32] } (VOP3PMods:{ *:[v2f32] } v2f32:{ *:[v2f32] }:$src0, i32:{ *:[i32] }:$src0_modifiers), (VOP3PMods:{ *:[v2f32] } v2f32:{ *:[v2f32] }:$src1, i32:{ *:[i32] }:$src1_modifiers)) - Complexity = -979
-               // Dst: (V_PK_ADD_F32:{ *:[v2f32] } i32:{ *:[i32] }:$src0_modifiers, v2f32:{ *:[v2f32] }:$src0, i32:{ *:[i32] }:$src1_modifiers, v2f32:{ *:[v2f32] }:$src1)
-/*529460*/    0, /*End of Scope*/
-/*529461*/   0, /*End of Scope*/
-/*529462*/  0, /*End of Scope*/
+/*529462*/    0, /*End of Scope*/
+/*529463*/   0, /*End of Scope*/
+/*529464*/  0, /*End of Scope*/
   }; // Total Array size is 563301 bytes
 
   SelectCodeCommon(N, MatcherTable, sizeof(MatcherTable));

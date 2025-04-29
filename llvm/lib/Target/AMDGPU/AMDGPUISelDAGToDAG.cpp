@@ -793,7 +793,7 @@ void AMDGPUDAGToDAGISel::Select(SDNode *N) {
   }
   }
 
-  if (N->getOpcode() == ISD::FADD && false) {
+  if (N->getOpcode() == ISD::FADD) {
     llvm::dbgs() << "N->dump()\n";
     N->dump();
     MySelectCode(N);
