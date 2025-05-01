@@ -279,6 +279,7 @@ void RegBankLegalizeHelper::lower(MachineInstr &MI,
 }
 
 LLT RegBankLegalizeHelper::getTyFromID(RegBankLLTMappingApplyID ID) {
+  using enum RegBankLLTMappingApplyID;
   switch (ID) {
   case Vcc:
   case UniInVcc:
@@ -320,6 +321,7 @@ LLT RegBankLegalizeHelper::getTyFromID(RegBankLLTMappingApplyID ID) {
 }
 
 LLT RegBankLegalizeHelper::getBTyFromID(RegBankLLTMappingApplyID ID, LLT Ty) {
+  using enum RegBankLLTMappingApplyID;
   switch (ID) {
   case SgprB32:
   case VgprB32:
@@ -372,6 +374,7 @@ LLT RegBankLegalizeHelper::getBTyFromID(RegBankLLTMappingApplyID ID, LLT Ty) {
 
 const RegisterBank *
 RegBankLegalizeHelper::getRegBankFromID(RegBankLLTMappingApplyID ID) {
+  using enum RegBankLLTMappingApplyID;
   switch (ID) {
   case Vcc:
     return VccRB;
@@ -426,6 +429,7 @@ RegBankLegalizeHelper::getRegBankFromID(RegBankLLTMappingApplyID ID) {
 void RegBankLegalizeHelper::applyMappingDst(
     MachineInstr &MI, unsigned &OpIdx,
     const SmallVectorImpl<RegBankLLTMappingApplyID> &MethodIDs) {
+  using enum RegBankLLTMappingApplyID;
   // Defs start from operand 0
   for (; OpIdx < MethodIDs.size(); ++OpIdx) {
     if (MethodIDs[OpIdx] == None)
@@ -531,6 +535,7 @@ void RegBankLegalizeHelper::applyMappingSrc(
     MachineInstr &MI, unsigned &OpIdx,
     const SmallVectorImpl<RegBankLLTMappingApplyID> &MethodIDs,
     SmallSet<Register, 4> &SgprWaterfallOperandRegs) {
+  using enum RegBankLLTMappingApplyID;
   for (unsigned i = 0; i < MethodIDs.size(); ++OpIdx, ++i) {
     if (MethodIDs[i] == None || MethodIDs[i] == IntrId || MethodIDs[i] == Imm)
       continue;

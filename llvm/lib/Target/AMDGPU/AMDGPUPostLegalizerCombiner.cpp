@@ -37,7 +37,7 @@
 using namespace llvm;
 using namespace MIPatternMatch;
 
-namespace {
+namespace MY_UNITY_ID {
 #define GET_GICOMBINER_TYPES
 #include "AMDGPUGenPostLegalizeGICombiner.inc"
 #undef GET_GICOMBINER_TYPES
@@ -458,7 +458,7 @@ private:
 };
 } // end anonymous namespace
 
-void AMDGPUPostLegalizerCombiner::getAnalysisUsage(AnalysisUsage &AU) const {
+void MY_UNITY_ID::AMDGPUPostLegalizerCombiner::getAnalysisUsage(AnalysisUsage &AU) const {
   AU.addRequired<TargetPassConfig>();
   AU.setPreservesCFG();
   getSelectionDAGFallbackAnalysisUsage(AU);
@@ -471,13 +471,13 @@ void AMDGPUPostLegalizerCombiner::getAnalysisUsage(AnalysisUsage &AU) const {
   MachineFunctionPass::getAnalysisUsage(AU);
 }
 
-AMDGPUPostLegalizerCombiner::AMDGPUPostLegalizerCombiner(bool IsOptNone)
+MY_UNITY_ID::AMDGPUPostLegalizerCombiner::AMDGPUPostLegalizerCombiner(bool IsOptNone)
     : MachineFunctionPass(ID), IsOptNone(IsOptNone) {
   if (!RuleConfig.parseCommandLineOption())
     report_fatal_error("Invalid rule identifier");
 }
 
-bool AMDGPUPostLegalizerCombiner::runOnMachineFunction(MachineFunction &MF) {
+bool MY_UNITY_ID::AMDGPUPostLegalizerCombiner::runOnMachineFunction(MachineFunction &MF) {
   if (MF.getProperties().hasProperty(
           MachineFunctionProperties::Property::FailedISel))
     return false;
@@ -507,16 +507,31 @@ bool AMDGPUPostLegalizerCombiner::runOnMachineFunction(MachineFunction &MF) {
   return Impl.combineMachineInstrs();
 }
 
-char AMDGPUPostLegalizerCombiner::ID = 0;
+char MY_UNITY_ID::AMDGPUPostLegalizerCombiner::ID = 0;
 INITIALIZE_PASS_BEGIN(AMDGPUPostLegalizerCombiner, DEBUG_TYPE,
                       "Combine AMDGPU machine instrs after legalization", false,
                       false)
 INITIALIZE_PASS_DEPENDENCY(TargetPassConfig)
 INITIALIZE_PASS_DEPENDENCY(GISelValueTrackingAnalysis)
-INITIALIZE_PASS_END(AMDGPUPostLegalizerCombiner, DEBUG_TYPE,
-                    "Combine AMDGPU machine instrs after legalization", false,
-                    false)
+// INITIALIZE_PASS_END(AMDGPUPostLegalizerCombiner, DEBUG_TYPE,
+//                     "Combine AMDGPU machine instrs after legalization", false,
+//                     false)
+PassInfo *PI = new PassInfo(
+     "Combine AMDGPU machine instrs after legalization",
+     "amdgpu-postlegalizer-combiner", &MY_UNITY_ID::AMDGPUPostLegalizerCombiner::ID,
+     PassInfo::NormalCtor_t(callDefaultCtor<MY_UNITY_ID::AMDGPUPostLegalizerCombiner>),
+     false, false);
+Registry.registerPass(*PI, true);
+}
+
+static llvm::once_flag InitializeAMDGPUPostLegalizerCombinerPassFlag;
+
+void llvm::initializeAMDGPUPostLegalizerCombinerPass(PassRegistry &Registry) {
+  llvm::call_once(InitializeAMDGPUPostLegalizerCombinerPassFlag,
+                  initializeAMDGPUPostLegalizerCombinerPassOnce,
+                  std::ref(Registry));
+}
 
 FunctionPass *llvm::createAMDGPUPostLegalizeCombiner(bool IsOptNone) {
-  return new AMDGPUPostLegalizerCombiner(IsOptNone);
+  return new MY_UNITY_ID::AMDGPUPostLegalizerCombiner(IsOptNone);
 }

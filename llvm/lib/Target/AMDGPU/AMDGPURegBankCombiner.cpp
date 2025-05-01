@@ -36,7 +36,7 @@
 using namespace llvm;
 using namespace MIPatternMatch;
 
-namespace {
+namespace MY_UNITY_ID {
 #define GET_GICOMBINER_TYPES
 #include "AMDGPUGenRegBankGICombiner.inc"
 #undef GET_GICOMBINER_TYPES
@@ -412,7 +412,7 @@ private:
 };
 } // end anonymous namespace
 
-void AMDGPURegBankCombiner::getAnalysisUsage(AnalysisUsage &AU) const {
+void MY_UNITY_ID::AMDGPURegBankCombiner::getAnalysisUsage(AnalysisUsage &AU) const {
   AU.addRequired<TargetPassConfig>();
   AU.setPreservesCFG();
   getSelectionDAGFallbackAnalysisUsage(AU);
@@ -425,13 +425,13 @@ void AMDGPURegBankCombiner::getAnalysisUsage(AnalysisUsage &AU) const {
   MachineFunctionPass::getAnalysisUsage(AU);
 }
 
-AMDGPURegBankCombiner::AMDGPURegBankCombiner(bool IsOptNone)
+MY_UNITY_ID::AMDGPURegBankCombiner::AMDGPURegBankCombiner(bool IsOptNone)
     : MachineFunctionPass(ID), IsOptNone(IsOptNone) {
   if (!RuleConfig.parseCommandLineOption())
     report_fatal_error("Invalid rule identifier");
 }
 
-bool AMDGPURegBankCombiner::runOnMachineFunction(MachineFunction &MF) {
+bool MY_UNITY_ID::AMDGPURegBankCombiner::runOnMachineFunction(MachineFunction &MF) {
   if (MF.getProperties().hasProperty(
           MachineFunctionProperties::Property::FailedISel))
     return false;
@@ -461,16 +461,31 @@ bool AMDGPURegBankCombiner::runOnMachineFunction(MachineFunction &MF) {
   return Impl.combineMachineInstrs();
 }
 
-char AMDGPURegBankCombiner::ID = 0;
+char MY_UNITY_ID::AMDGPURegBankCombiner::ID = 0;
 INITIALIZE_PASS_BEGIN(AMDGPURegBankCombiner, DEBUG_TYPE,
                       "Combine AMDGPU machine instrs after regbankselect",
                       false, false)
 INITIALIZE_PASS_DEPENDENCY(TargetPassConfig)
 INITIALIZE_PASS_DEPENDENCY(GISelValueTrackingAnalysis)
-INITIALIZE_PASS_END(AMDGPURegBankCombiner, DEBUG_TYPE,
-                    "Combine AMDGPU machine instrs after regbankselect", false,
-                    false)
+// INITIALIZE_PASS_END(AMDGPURegBankCombiner, DEBUG_TYPE,
+//                     "Combine AMDGPU machine instrs after regbankselect", false,
+//                     false)
+
+PassInfo *PI = new PassInfo(
+     "Combine AMDGPU machine instrs after regbankselect",
+     "amdgpu-regbank-combiner", &MY_UNITY_ID::AMDGPURegBankCombiner::ID,
+     PassInfo::NormalCtor_t(callDefaultCtor<MY_UNITY_ID::AMDGPURegBankCombiner>), false,
+     false);
+Registry.registerPass(*PI, true);
+}
+
+static llvm::once_flag InitializeAMDGPURegBankCombinerPassFlag;
+
+void llvm::initializeAMDGPURegBankCombinerPass(PassRegistry &Registry) {
+  llvm::call_once(InitializeAMDGPURegBankCombinerPassFlag,
+                  initializeAMDGPURegBankCombinerPassOnce, std::ref(Registry));
+}
 
 FunctionPass *llvm::createAMDGPURegBankCombiner(bool IsOptNone) {
-  return new AMDGPURegBankCombiner(IsOptNone);
+  return new MY_UNITY_ID::AMDGPURegBankCombiner(IsOptNone);
 }

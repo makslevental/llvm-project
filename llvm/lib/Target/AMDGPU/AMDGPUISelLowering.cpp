@@ -4751,7 +4751,7 @@ SDValue AMDGPUTargetLowering::performSelectCombine(SDNode *N,
   return performCtlz_CttzCombine(SDLoc(N), Cond, True, False, DCI);
 }
 
-static bool isInv2Pi(const APFloat &APF) {
+static bool PREFIX_MY_UNITY_ID(isInv2Pi)(const APFloat &APF) {
   static const APFloat KF16(APFloat::IEEEhalf(), APInt(16, 0x3118));
   static const APFloat KF32(APFloat::IEEEsingle(), APInt(32, 0x3e22f983));
   static const APFloat KF64(APFloat::IEEEdouble(), APInt(64, 0x3fc45f306dc9c882));
@@ -4768,7 +4768,7 @@ AMDGPUTargetLowering::getConstantNegateCost(const ConstantFPSDNode *C) const {
   if (C->isZero())
     return C->isNegative() ? NegatibleCost::Cheaper : NegatibleCost::Expensive;
 
-  if (Subtarget->hasInv2PiInlineImm() && isInv2Pi(C->getValueAPF()))
+  if (Subtarget->hasInv2PiInlineImm() && PREFIX_MY_UNITY_ID(isInv2Pi)(C->getValueAPF()))
     return C->isNegative() ? NegatibleCost::Cheaper : NegatibleCost::Expensive;
 
   return NegatibleCost::Neutral;
@@ -4786,7 +4786,7 @@ bool AMDGPUTargetLowering::isConstantCheaperToNegate(SDValue N) const {
   return false;
 }
 
-static unsigned inverseMinMax(unsigned Opc) {
+static unsigned PREFIX_MY_UNITY_ID(inverseMinMax)(unsigned Opc) {
   switch (Opc) {
   case ISD::FMAXNUM:
     return ISD::FMINNUM;
@@ -4942,7 +4942,7 @@ SDValue AMDGPUTargetLowering::performFNegCombine(SDNode *N,
 
     SDValue NegLHS = DAG.getNode(ISD::FNEG, SL, VT, LHS);
     SDValue NegRHS = DAG.getNode(ISD::FNEG, SL, VT, RHS);
-    unsigned Opposite = inverseMinMax(Opc);
+    unsigned Opposite = PREFIX_MY_UNITY_ID(inverseMinMax)(Opc);
 
     SDValue Res = DAG.getNode(Opposite, SL, VT, NegLHS, NegRHS, N0->getFlags());
     if (Res.getOpcode() != Opposite)

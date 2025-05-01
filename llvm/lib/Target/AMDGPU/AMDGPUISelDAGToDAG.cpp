@@ -2687,7 +2687,7 @@ void AMDGPUDAGToDAGISel::SelectDSBvhStackIntrinsic(SDNode *N, unsigned IntrID) {
   CurDAG->setNodeMemRefs(cast<MachineSDNode>(Selected), {MMO});
 }
 
-static unsigned gwsIntrinToOpcode(unsigned IntrID) {
+static unsigned MY_UNITY_ID_gwsIntrinToOpcode(unsigned IntrID) {
   switch (IntrID) {
   case Intrinsic::amdgcn_ds_gws_init:
     return AMDGPU::DS_GWS_INIT;
@@ -2761,7 +2761,7 @@ void AMDGPUDAGToDAGISel::SelectDS_GWS(SDNode *N, unsigned IntrID) {
   SDValue Chain = N->getOperand(0);
   SDValue OffsetField = CurDAG->getTargetConstant(ImmOffset, SL, MVT::i32);
 
-  const unsigned Opc = gwsIntrinToOpcode(IntrID);
+  const unsigned Opc = MY_UNITY_ID_gwsIntrinToOpcode(IntrID);
   SmallVector<SDValue, 5> Ops;
   if (HasVSrc)
     Ops.push_back(N->getOperand(2));

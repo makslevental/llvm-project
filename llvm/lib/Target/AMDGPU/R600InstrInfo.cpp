@@ -337,7 +337,7 @@ R600InstrInfo::ExtractSrcs(MachineInstr &MI,
 }
 
 static std::vector<std::pair<int, unsigned>>
-Swizzle(std::vector<std::pair<int, unsigned>> Src,
+PREFIX_MY_UNITY_ID(Swizzle)(std::vector<std::pair<int, unsigned>> Src,
         R600InstrInfo::BankSwizzle Swz) {
   if (Src[0] == Src[1])
     Src[1].first = -1;
@@ -385,7 +385,7 @@ static unsigned getTransSwizzle(R600InstrInfo::BankSwizzle Swz, unsigned Op) {
     return Cycles[Op];
   }
   default:
-    llvm_unreachable("Wrong Swizzle for Trans Slot");
+    llvm_unreachable("Wrong PREFIX_MY_UNITY_ID(Swizzle) for Trans Slot");
   }
 }
 
@@ -401,7 +401,7 @@ unsigned  R600InstrInfo::isLegalUpTo(
   memset(Vector, -1, sizeof(Vector));
   for (unsigned i = 0, e = IGSrcs.size(); i < e; i++) {
     const std::vector<std::pair<int, unsigned>> &Srcs =
-        Swizzle(IGSrcs[i], Swz[i]);
+        PREFIX_MY_UNITY_ID(Swizzle)(IGSrcs[i], Swz[i]);
     for (unsigned j = 0; j < 3; j++) {
       const std::pair<int, unsigned> &Src = Srcs[j];
       if (Src.first < 0 || Src.first == 255)
@@ -459,7 +459,7 @@ NextPossibleSolution(
   return true;
 }
 
-/// Enumerate all possible Swizzle sequence to find one that can meet all
+/// Enumerate all possible PREFIX_MY_UNITY_ID(Swizzle) sequence to find one that can meet all
 /// read port requirements.
 bool R600InstrInfo::FindSwizzleForVectorSlot(
     const std::vector<std::vector<std::pair<int, unsigned>>> &IGSrcs,

@@ -23,7 +23,6 @@
 #include <optional>
 
 using namespace llvm;
-using namespace llvm::PatternMatch;
 
 #define DEBUG_TYPE "AMDGPUtti"
 
@@ -89,8 +88,8 @@ static bool canSafelyConvertTo16Bit(Value &V, bool IsFloat) {
   }
 
   Value *CastSrc;
-  bool IsExt = IsFloat ? match(&V, m_FPExt(PatternMatch::m_Value(CastSrc)))
-                       : match(&V, m_ZExt(PatternMatch::m_Value(CastSrc)));
+  bool IsExt = IsFloat ? match(&V, PatternMatch::m_FPExt(PatternMatch::m_Value(CastSrc)))
+                       : match(&V, PatternMatch::m_ZExt(PatternMatch::m_Value(CastSrc)));
   if (IsExt) {
     Type *CastSrcTy = CastSrc->getType();
     if (CastSrcTy->isHalfTy() || CastSrcTy->isIntegerTy(16))
@@ -354,10 +353,10 @@ bool GCNTTIImpl::canSimplifyLegacyMulToMul(const Instruction &I,
 static Value *matchFPExtFromF16(Value *Arg) {
   Value *Src = nullptr;
   ConstantFP *CFP = nullptr;
-  if (match(Arg, m_OneUse(m_FPExt(m_Value(Src))))) {
+  if (match(Arg, PatternMatch::m_OneUse(PatternMatch::m_FPExt(PatternMatch::m_Value(Src))))) {
     if (Src->getType()->isHalfTy())
       return Src;
-  } else if (match(Arg, m_ConstantFP(CFP))) {
+  } else if (match(Arg, PatternMatch::m_ConstantFP(CFP))) {
     bool LosesInfo;
     APFloat Val(CFP->getValueAPF());
     Val.convert(APFloat::IEEEhalf(), APFloat::rmNearestTiesToEven, &LosesInfo);
@@ -685,7 +684,7 @@ GCNTTIImpl::instCombineIntrinsic(InstCombiner &IC, IntrinsicInst &II) const {
         return UndefValue::get(HalfTy);
 
       ConstantFP *CFP = nullptr;
-      if (match(Arg, m_ConstantFP(CFP))) {
+      if (match(Arg, PatternMatch::m_ConstantFP(CFP))) {
         bool LosesInfo;
         APFloat Val(CFP->getValueAPF());
         Val.convert(APFloat::IEEEhalf(), APFloat::rmTowardZero, &LosesInfo);
@@ -693,7 +692,7 @@ GCNTTIImpl::instCombineIntrinsic(InstCombiner &IC, IntrinsicInst &II) const {
       }
 
       Value *Src = nullptr;
-      if (match(Arg, m_FPExt(m_Value(Src)))) {
+      if (match(Arg, PatternMatch::m_FPExt(PatternMatch::m_Value(Src)))) {
         if (Src->getType()->isHalfTy())
           return Src;
       }
@@ -989,9 +988,9 @@ GCNTTIImpl::instCombineIntrinsic(InstCombiner &IC, IntrinsicInst &II) const {
     Value *ExtSrc;
     if (CCVal == CmpInst::ICMP_EQ &&
         ((match(Src1, PatternMatch::m_One()) &&
-          match(Src0, m_ZExt(PatternMatch::m_Value(ExtSrc)))) ||
+          match(Src0, PatternMatch::m_ZExt(PatternMatch::m_Value(ExtSrc)))) ||
          (match(Src1, PatternMatch::m_AllOnes()) &&
-          match(Src0, m_SExt(PatternMatch::m_Value(ExtSrc))))) &&
+          match(Src0, PatternMatch::m_SExt(PatternMatch::m_Value(ExtSrc))))) &&
         ExtSrc->getType()->isIntegerTy(1)) {
       IC.replaceOperand(II, 1, ConstantInt::getNullValue(Src1->getType()));
       IC.replaceOperand(II, 2,
@@ -1015,7 +1014,7 @@ GCNTTIImpl::instCombineIntrinsic(InstCombiner &IC, IntrinsicInst &II) const {
     //   -> llvm.amdgcn.[if]cmp(a, b, inv pred)
     if (match(Src1, PatternMatch::m_Zero()) &&
         match(Src0, PatternMatch::m_ZExtOrSExt(
-                        m_Cmp(SrcPred, PatternMatch::m_Value(SrcLHS),
+                        PatternMatch::m_Cmp(SrcPred, PatternMatch::m_Value(SrcLHS),
                               PatternMatch::m_Value(SrcRHS))))) {
       if (CCVal == CmpInst::ICMP_EQ)
         SrcPred = CmpInst::getInversePredicate(SrcPred);

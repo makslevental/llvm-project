@@ -90,7 +90,6 @@
 #include "AMDGPUGenRegisterBankInfo.def"
 
 using namespace llvm;
-using namespace MIPatternMatch;
 
 namespace {
 
@@ -1604,7 +1603,7 @@ bool AMDGPURegisterBankInfo::applyMappingMAD_64_32(
   bool Accumulate = true;
 
   if (!DstOnValu) {
-    if (mi_match(Src2, MRI, m_ZeroInt()))
+    if (mi_match(Src2, MRI, MIPatternMatch::m_ZeroInt()))
       Accumulate = false;
   }
 
@@ -1808,7 +1807,7 @@ Register AMDGPURegisterBankInfo::handleD16VData(MachineIRBuilder &B,
 }
 
 static std::pair<Register, unsigned>
-getBaseWithConstantOffset(MachineRegisterInfo &MRI, Register Reg) {
+PREFIX_MY_UNITY_ID(getBaseWithConstantOffset)(MachineRegisterInfo &MRI, Register Reg) {
   int64_t Const;
   if (mi_match(Reg, MRI, m_ICst(Const)))
     return std::pair(Register(), Const);
@@ -1830,7 +1829,7 @@ AMDGPURegisterBankInfo::splitBufferOffsets(MachineIRBuilder &B,
   const LLT S32 = LLT::scalar(32);
 
   // TODO: Use AMDGPU::getBaseWithConstantOffset() instead.
-  std::tie(BaseReg, ImmOffset) = getBaseWithConstantOffset(*B.getMRI(),
+  std::tie(BaseReg, ImmOffset) = PREFIX_MY_UNITY_ID(getBaseWithConstantOffset)(*B.getMRI(),
                                                            OrigOffset);
 
   unsigned C1 = 0;

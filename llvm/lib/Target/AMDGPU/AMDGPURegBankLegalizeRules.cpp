@@ -24,7 +24,6 @@
 #define DEBUG_TYPE "amdgpu-regbanklegalize"
 
 using namespace llvm;
-using namespace AMDGPU;
 
 RegBankLLTMapping::RegBankLLTMapping(
     std::initializer_list<RegBankLLTMappingApplyID> DstOpMappingList,
@@ -42,13 +41,13 @@ bool matchUniformityAndLLT(Register Reg, UniformityLLTOpPredicateID UniID,
                            const MachineUniformityInfo &MUI,
                            const MachineRegisterInfo &MRI) {
   switch (UniID) {
-  case S1:
+  case AMDGPU::S1:
     return MRI.getType(Reg) == LLT::scalar(1);
-  case S16:
+  case AMDGPU::S16:
     return MRI.getType(Reg) == LLT::scalar(16);
-  case S32:
+  case AMDGPU::S32:
     return MRI.getType(Reg) == LLT::scalar(32);
-  case S64:
+  case AMDGPU::S64:
     return MRI.getType(Reg) == LLT::scalar(64);
   case P0:
     return MRI.getType(Reg) == LLT::pointer(0, 64);
@@ -60,7 +59,7 @@ bool matchUniformityAndLLT(Register Reg, UniformityLLTOpPredicateID UniID,
     return MRI.getType(Reg) == LLT::pointer(4, 64);
   case P5:
     return MRI.getType(Reg) == LLT::pointer(5, 32);
-  case V4S32:
+  case AMDGPU::V4S32:
     return MRI.getType(Reg) == LLT::fixed_vector(4, 32);
   case B32:
     return MRI.getType(Reg).getSizeInBits() == 32;
@@ -173,19 +172,19 @@ SetOfRulesForOpcode::SetOfRulesForOpcode(FastRulesTypes FastTypes)
 
 UniformityLLTOpPredicateID LLTToId(LLT Ty) {
   if (Ty == LLT::scalar(16))
-    return S16;
+    return AMDGPU::S16;
   if (Ty == LLT::scalar(32))
-    return S32;
+    return AMDGPU::S32;
   if (Ty == LLT::scalar(64))
-    return S64;
+    return AMDGPU::S64;
   if (Ty == LLT::fixed_vector(2, 16))
-    return V2S16;
+    return AMDGPU::V2S16;
   if (Ty == LLT::fixed_vector(2, 32))
-    return V2S32;
+    return AMDGPU::V2S32;
   if (Ty == LLT::fixed_vector(3, 32))
-    return V3S32;
+    return AMDGPU::V3S32;
   if (Ty == LLT::fixed_vector(4, 32))
-    return V4S32;
+    return AMDGPU::V4S32;
   return _;
 }
 
@@ -432,6 +431,7 @@ RegBankLegalizeRules::RegBankLegalizeRules(const GCNSubtarget &_ST,
                                            MachineRegisterInfo &_MRI)
     : ST(&_ST), MRI(&_MRI) {
 
+  using enum RegBankLLTMappingApplyID;
   addRulesForGOpcs({G_ADD}, Standard)
       .Uni(S32, {{Sgpr32}, {Sgpr32, Sgpr32}})
       .Div(S32, {{Vgpr32}, {Vgpr32, Vgpr32}});

@@ -32,7 +32,6 @@
 #define DEBUG_TYPE "amdgpu-isel"
 
 using namespace llvm;
-using namespace MIPatternMatch;
 
 #define GET_GLOBALISEL_IMPL
 #define AMDGPUSubtarget GCNSubtarget
@@ -830,10 +829,10 @@ bool AMDGPUInstructionSelector::selectG_BUILD_VECTOR(MachineInstr &MI) const {
   //  => (S_PACK_LL_B32_B16 $src0, $src1)
 
   bool Shift0 = mi_match(
-      Src0, *MRI, m_OneUse(m_GLShr(m_Reg(ShiftSrc0), m_SpecificICst(16))));
+      Src0, *MRI, MIPatternMatch::m_OneUse(MIPatternMatch::m_GLShr(MIPatternMatch::m_Reg(ShiftSrc0), MIPatternMatch::m_SpecificICst(16))));
 
   bool Shift1 = mi_match(
-      Src1, *MRI, m_OneUse(m_GLShr(m_Reg(ShiftSrc1), m_SpecificICst(16))));
+      Src1, *MRI, MIPatternMatch::m_OneUse(MIPatternMatch::m_GLShr(MIPatternMatch::m_Reg(ShiftSrc1), MIPatternMatch::m_SpecificICst(16))));
 
   unsigned Opc = AMDGPU::S_PACK_LL_B32_B16;
   if (Shift0 && Shift1) {
@@ -1584,7 +1583,7 @@ static bool isLaneMaskFromSameBlock(Register Reg, MachineRegisterInfo &MRI,
 
   Register LHS, RHS;
   // Look through AND.
-  if (mi_match(Reg, MRI, m_GAnd(m_Reg(LHS), m_Reg(RHS))))
+  if (mi_match(Reg, MRI, MIPatternMatch::m_GAnd(MIPatternMatch::m_Reg(LHS), MIPatternMatch::m_Reg(RHS))))
     return isLaneMaskFromSameBlock(LHS, MRI, MBB) ||
            isLaneMaskFromSameBlock(RHS, MRI, MBB);
 
@@ -2728,7 +2727,7 @@ static Register stripCopy(Register Reg, MachineRegisterInfo &MRI) {
 
 static Register stripBitCast(Register Reg, MachineRegisterInfo &MRI) {
   Register BitcastSrc;
-  if (mi_match(Reg, MRI, m_GBitcast(m_Reg(BitcastSrc))))
+  if (mi_match(Reg, MRI, MIPatternMatch::m_GBitcast(MIPatternMatch::m_Reg(BitcastSrc))))
     Reg = BitcastSrc;
   return Reg;
 }
@@ -2736,14 +2735,14 @@ static Register stripBitCast(Register Reg, MachineRegisterInfo &MRI) {
 static bool isExtractHiElt(MachineRegisterInfo &MRI, Register In,
                            Register &Out) {
   Register Trunc;
-  if (!mi_match(In, MRI, m_GTrunc(m_Reg(Trunc))))
+  if (!mi_match(In, MRI, MIPatternMatch::m_GTrunc(MIPatternMatch::m_Reg(Trunc))))
     return false;
 
   Register LShlSrc;
   Register Cst;
-  if (mi_match(Trunc, MRI, m_GLShr(m_Reg(LShlSrc), m_Reg(Cst)))) {
+  if (mi_match(Trunc, MRI, MIPatternMatch::m_GLShr(MIPatternMatch::m_Reg(LShlSrc), MIPatternMatch::m_Reg(Cst)))) {
     Cst = stripCopy(Cst, MRI);
-    if (mi_match(Cst, MRI, m_SpecificICst(16))) {
+    if (mi_match(Cst, MRI, MIPatternMatch::m_SpecificICst(16))) {
       Out = stripBitCast(LShlSrc, MRI);
       return true;
     }
@@ -3487,7 +3486,7 @@ bool AMDGPUInstructionSelector::selectBufferLoadLds(MachineInstr &MI) const {
 /// Match a zero extend from a 32-bit value to 64-bits.
 static Register matchZeroExtendFromS32(MachineRegisterInfo &MRI, Register Reg) {
   Register ZExtSrc;
-  if (mi_match(Reg, MRI, m_GZExt(m_Reg(ZExtSrc))))
+  if (mi_match(Reg, MRI, MIPatternMatch::m_GZExt(MIPatternMatch::m_Reg(ZExtSrc))))
     return MRI.getType(ZExtSrc) == LLT::scalar(32) ? ZExtSrc : Register();
 
   // Match legalized form %zext = G_MERGE_VALUES (s32 %x), (s32 0)
@@ -3497,7 +3496,7 @@ static Register matchZeroExtendFromS32(MachineRegisterInfo &MRI, Register Reg) {
 
   assert(Def->getNumOperands() == 3 &&
          MRI.getType(Def->getOperand(0).getReg()) == LLT::scalar(64));
-  if (mi_match(Def->getOperand(2).getReg(), MRI, m_ZeroInt())) {
+  if (mi_match(Def->getOperand(2).getReg(), MRI, MIPatternMatch::m_ZeroInt())) {
     return Def->getOperand(1).getReg();
   }
 
@@ -3783,11 +3782,11 @@ static std::pair<unsigned, uint8_t> BitOp3_Op(Register R,
     //                          1     1     1
     const uint8_t SrcBits[3] = { 0xf0, 0xcc, 0xaa };
 
-    if (mi_match(Op, MRI, m_AllOnesInt())) {
+    if (mi_match(Op, MRI, MIPatternMatch::m_AllOnesInt())) {
       Bits = 0xff;
       return true;
     }
-    if (mi_match(Op, MRI, m_ZeroInt())) {
+    if (mi_match(Op, MRI, MIPatternMatch::m_ZeroInt())) {
       Bits = 0;
       return true;
     }
@@ -3811,7 +3810,7 @@ static std::pair<unsigned, uint8_t> BitOp3_Op(Register R,
       // one of our source operands. In this case we can compute the bits
       // without growing Src vector.
       Register LHS;
-      if (mi_match(Op, MRI, m_Not(m_Reg(LHS)))) {
+      if (mi_match(Op, MRI, MIPatternMatch::m_Not(MIPatternMatch::m_Reg(LHS)))) {
         LHS = getSrcRegIgnoringCopies(LHS, MRI);
         for (unsigned I = 0; I < Src.size(); ++I) {
           if (Src[I] == LHS) {
@@ -3906,9 +3905,9 @@ bool AMDGPUInstructionSelector::selectBITOP3(MachineInstr &MI) const {
     // Avoid using BITOP3 for OR3, XOR3, AND_OR. This is not faster but makes
     // asm more readable. This cannot be modeled with AddedComplexity because
     // selector does not know how many operations did we match.
-    if (mi_match(MI, *MRI, m_GXor(m_GXor(m_Reg(), m_Reg()), m_Reg())) ||
-        mi_match(MI, *MRI, m_GOr(m_GOr(m_Reg(), m_Reg()), m_Reg())) ||
-        mi_match(MI, *MRI, m_GOr(m_GAnd(m_Reg(), m_Reg()), m_Reg())))
+    if (mi_match(MI, *MRI, MIPatternMatch::m_GXor(MIPatternMatch::m_GXor(MIPatternMatch::m_Reg(), MIPatternMatch::m_Reg()), MIPatternMatch::m_Reg())) ||
+        mi_match(MI, *MRI, MIPatternMatch::m_GOr(MIPatternMatch::m_GOr(MIPatternMatch::m_Reg(), MIPatternMatch::m_Reg()), MIPatternMatch::m_Reg())) ||
+        mi_match(MI, *MRI, MIPatternMatch::m_GOr(MIPatternMatch::m_GAnd(MIPatternMatch::m_Reg(), MIPatternMatch::m_Reg()), MIPatternMatch::m_Reg())))
       return false;
   } else if (NumOpcodes < 4) {
     // For a uniform case threshold should be higher to account for moves
@@ -4441,7 +4440,7 @@ static void selectWMMAModsNegAbs(unsigned ModOpcode, unsigned &Mods,
     SmallVector<Register, 8> NegAbsElts;
     for (auto El : Elts) {
       Register FabsSrc;
-      if (!mi_match(El, MRI, m_GFabs(m_Reg(FabsSrc))))
+      if (!mi_match(El, MRI, MIPatternMatch::m_GFabs(MIPatternMatch::m_Reg(FabsSrc))))
         break;
       NegAbsElts.push_back(FabsSrc);
     }
@@ -4501,7 +4500,7 @@ AMDGPUInstructionSelector::selectWMMAModsF16Neg(MachineOperand &Root) const {
   if (GConcatVectors *CV = dyn_cast<GConcatVectors>(MRI->getVRegDef(Src))) {
     for (unsigned i = 0; i < CV->getNumSources(); ++i) {
       Register FNegSrc;
-      if (!mi_match(CV->getSourceReg(i), *MRI, m_GFNeg(m_Reg(FNegSrc))))
+      if (!mi_match(CV->getSourceReg(i), *MRI, MIPatternMatch::m_GFNeg(MIPatternMatch::m_Reg(FNegSrc))))
         break;
       EltsV2F16.push_back(FNegSrc);
     }
@@ -4554,7 +4553,7 @@ AMDGPUInstructionSelector::selectWMMAModsF16NegAbs(MachineOperand &Root) const {
 InstructionSelector::ComplexRendererFns
 AMDGPUInstructionSelector::selectWMMAVISrc(MachineOperand &Root) const {
   std::optional<FPValueAndVReg> FPValReg;
-  if (mi_match(Root.getReg(), *MRI, m_GFCstOrSplat(FPValReg))) {
+  if (mi_match(Root.getReg(), *MRI, MIPatternMatch::m_GFCstOrSplat(FPValReg))) {
     if (TII.isInlineConstant(FPValReg->Value)) {
       return {{[=](MachineInstrBuilder &MIB) {
         MIB.addImm(FPValReg->Value.bitcastToAPInt().getSExtValue());
@@ -4566,7 +4565,7 @@ AMDGPUInstructionSelector::selectWMMAVISrc(MachineOperand &Root) const {
   }
 
   APInt ICst;
-  if (mi_match(Root.getReg(), *MRI, m_ICstOrSplat(ICst))) {
+  if (mi_match(Root.getReg(), *MRI, MIPatternMatch::m_ICstOrSplat(ICst))) {
     if (TII.isInlineConstant(ICst)) {
       return {
           {[=](MachineInstrBuilder &MIB) { MIB.addImm(ICst.getSExtValue()); }}};
@@ -4584,7 +4583,7 @@ AMDGPUInstructionSelector::selectSWMMACIndex8(MachineOperand &Root) const {
 
   Register ShiftSrc;
   std::optional<ValueAndVReg> ShiftAmt;
-  if (mi_match(Src, *MRI, m_GLShr(m_Reg(ShiftSrc), m_GCst(ShiftAmt))) &&
+  if (mi_match(Src, *MRI, MIPatternMatch::m_GLShr(MIPatternMatch::m_Reg(ShiftSrc), MIPatternMatch::m_GCst(ShiftAmt))) &&
       MRI->getType(ShiftSrc).getSizeInBits() == 32 &&
       ShiftAmt->Value.getZExtValue() % 8 == 0) {
     Key = ShiftAmt->Value.getZExtValue() / 8;
@@ -4606,7 +4605,7 @@ AMDGPUInstructionSelector::selectSWMMACIndex16(MachineOperand &Root) const {
 
   Register ShiftSrc;
   std::optional<ValueAndVReg> ShiftAmt;
-  if (mi_match(Src, *MRI, m_GLShr(m_Reg(ShiftSrc), m_GCst(ShiftAmt))) &&
+  if (mi_match(Src, *MRI, MIPatternMatch::m_GLShr(MIPatternMatch::m_Reg(ShiftSrc), MIPatternMatch::m_GCst(ShiftAmt))) &&
       MRI->getType(ShiftSrc).getSizeInBits() == 32 &&
       ShiftAmt->Value.getZExtValue() == 16) {
     Src = ShiftSrc;
@@ -5115,7 +5114,7 @@ AMDGPUInstructionSelector::selectMUBUFScratchOffen(MachineOperand &Root) const {
   const SIMachineFunctionInfo *Info = MF->getInfo<SIMachineFunctionInfo>();
 
   int64_t Offset = 0;
-  if (mi_match(Root.getReg(), *MRI, m_ICst(Offset)) &&
+  if (mi_match(Root.getReg(), *MRI, MIPatternMatch::m_ICst(Offset)) &&
       Offset != TM.getNullPointerValue(AMDGPUAS::PRIVATE_ADDRESS)) {
     Register HighBits = MRI->createVirtualRegister(&AMDGPU::VGPR_32RegClass);
 
@@ -5349,8 +5348,8 @@ AMDGPUInstructionSelector::selectMUBUFScratchOffset(
   // FIXME: Copy check is a hack
   Register BasePtr;
   if (mi_match(Reg, *MRI,
-               m_GPtrAdd(m_Reg(BasePtr),
-                         m_any_of(m_ICst(Offset), m_Copy(m_ICst(Offset)))))) {
+               MIPatternMatch::m_GPtrAdd(MIPatternMatch::m_Reg(BasePtr),
+                         MIPatternMatch::m_any_of(MIPatternMatch::m_ICst(Offset), MIPatternMatch::m_Copy(MIPatternMatch::m_ICst(Offset)))))) {
     if (!TII.isLegalMUBUFImmOffset(Offset))
       return {};
     MachineInstr *BasePtrDef = getDefIgnoringCopies(BasePtr, *MRI);
@@ -5369,7 +5368,7 @@ AMDGPUInstructionSelector::selectMUBUFScratchOffset(
     }};
   }
 
-  if (!mi_match(Root.getReg(), *MRI, m_ICst(Offset)) ||
+  if (!mi_match(Root.getReg(), *MRI, MIPatternMatch::m_ICst(Offset)) ||
       !TII.isLegalMUBUFImmOffset(Offset))
     return {};
 
@@ -5403,7 +5402,7 @@ AMDGPUInstructionSelector::selectDS1Addr1OffsetImpl(MachineOperand &Root) const 
     // TODO
 
 
-  } else if (mi_match(Root.getReg(), *MRI, m_ICst(ConstAddr))) {
+  } else if (mi_match(Root.getReg(), *MRI, MIPatternMatch::m_ICst(ConstAddr))) {
     // TODO
 
   }
@@ -5466,7 +5465,7 @@ AMDGPUInstructionSelector::selectDSReadWrite2Impl(MachineOperand &Root,
   } else if (RootDef->getOpcode() == AMDGPU::G_SUB) {
     // TODO
 
-  } else if (mi_match(Root.getReg(), *MRI, m_ICst(ConstAddr))) {
+  } else if (mi_match(Root.getReg(), *MRI, MIPatternMatch::m_ICst(ConstAddr))) {
     // TODO
 
   }
@@ -5763,7 +5762,7 @@ AMDGPUInstructionSelector::selectBUFSOffset(MachineOperand &Root) const {
 
   Register SOffset = Root.getReg();
 
-  if (STI.hasRestrictedSOffset() && mi_match(SOffset, *MRI, m_ZeroInt()))
+  if (STI.hasRestrictedSOffset() && mi_match(SOffset, *MRI, MIPatternMatch::m_ZeroInt()))
     SOffset = AMDGPU::SGPR_NULL;
 
   return {{[=](MachineInstrBuilder &MIB) { MIB.addReg(SOffset); }}};
@@ -5840,7 +5839,7 @@ AMDGPUInstructionSelector::selectVOP3PMadMixModsImpl(MachineOperand &Root,
   unsigned Mods;
   std::tie(Src, Mods) = selectVOP3ModsImpl(Root.getReg());
 
-  if (mi_match(Src, *MRI, m_GFPExt(m_Reg(Src)))) {
+  if (mi_match(Src, *MRI, MIPatternMatch::m_GFPExt(MIPatternMatch::m_Reg(Src)))) {
     assert(MRI->getType(Src) == LLT::scalar(16));
 
     // Only change Src if src modifier could be gained. In such cases new Src
@@ -6118,7 +6117,7 @@ void AMDGPUInstructionSelector::renderTruncTImm(MachineInstrBuilder &MIB,
                                                 int OpIdx) const {
   const MachineOperand &Op = MI.getOperand(OpIdx);
   int64_t Imm;
-  if (Op.isReg() && mi_match(Op.getReg(), *MRI, m_ICst(Imm)))
+  if (Op.isReg() && mi_match(Op.getReg(), *MRI, MIPatternMatch::m_ICst(Imm)))
     MIB.addImm(Imm);
   else
     MIB.addImm(Op.getImm());

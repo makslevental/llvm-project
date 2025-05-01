@@ -3559,18 +3559,18 @@ void SITargetLowering::passSpecialInputs(
   }
 }
 
-static bool canGuaranteeTCO(CallingConv::ID CC) {
+static bool PREFIX_MY_UNITY_ID(canGuaranteeTCO)(CallingConv::ID CC) {
   return CC == CallingConv::Fast;
 }
 
 /// Return true if we might ever do TCO for calls with this calling convention.
-static bool mayTailCallThisCC(CallingConv::ID CC) {
+static bool PREFIX_MY_UNITY_ID(mayTailCallThisCC)(CallingConv::ID CC) {
   switch (CC) {
   case CallingConv::C:
   case CallingConv::AMDGPU_Gfx:
     return true;
   default:
-    return canGuaranteeTCO(CC);
+    return PREFIX_MY_UNITY_ID(canGuaranteeTCO)(CC);
   }
 }
 
@@ -3582,7 +3582,7 @@ bool SITargetLowering::isEligibleForTailCallOptimization(
   if (AMDGPU::isChainCC(CalleeCC))
     return true;
 
-  if (!mayTailCallThisCC(CalleeCC))
+  if (!PREFIX_MY_UNITY_ID(mayTailCallThisCC)(CalleeCC))
     return false;
 
   // For a divergent call target, we need to do a waterfall loop over the
@@ -3604,7 +3604,7 @@ bool SITargetLowering::isEligibleForTailCallOptimization(
   bool CCMatch = CallerCC == CalleeCC;
 
   if (DAG.getTarget().Options.GuaranteedTailCallOpt) {
-    if (canGuaranteeTCO(CalleeCC) && CCMatch)
+    if (PREFIX_MY_UNITY_ID(canGuaranteeTCO)(CalleeCC) && CCMatch)
       return true;
     return false;
   }
@@ -3680,7 +3680,7 @@ bool SITargetLowering::mayBeEmittedAsTailCall(const CallInst *CI) const {
   return true;
 }
 
-namespace {
+namespace MY_UNITY_ID {
 // Chain calls have special arguments that we need to handle. These are
 // tagging along at the end of the arguments list(s), after the SGPR and VGPR
 // arguments (index 0 and 1 respectively).
@@ -3726,7 +3726,7 @@ SDValue SITargetLowering::LowerCall(CallLoweringInfo &CLI,
            "Haven't popped all the special args");
 
     TargetLowering::ArgListEntry RequestedExecArg =
-        CLI.Args[ChainCallArgIdx::Exec];
+        CLI.Args[MY_UNITY_ID::ChainCallArgIdx::Exec];
     if (!RequestedExecArg.Ty->isIntegerTy(Subtarget->getWavefrontSize()))
       return lowerUnhandledCall(CLI, InVals, "Invalid value for EXEC");
 
@@ -3743,15 +3743,15 @@ SDValue SITargetLowering::LowerCall(CallLoweringInfo &CLI,
     PushNodeOrTargetConstant(RequestedExecArg);
 
     // Process any other special arguments depending on the value of the flags.
-    TargetLowering::ArgListEntry Flags = CLI.Args[ChainCallArgIdx::Flags];
+    TargetLowering::ArgListEntry Flags = CLI.Args[MY_UNITY_ID::ChainCallArgIdx::Flags];
 
     const APInt &FlagsValue = cast<ConstantSDNode>(Flags.Node)->getAPIntValue();
     if (FlagsValue.isZero()) {
-      if (CLI.Args.size() > ChainCallArgIdx::Flags + 1)
+      if (CLI.Args.size() > MY_UNITY_ID::ChainCallArgIdx::Flags + 1)
         return lowerUnhandledCall(CLI, InVals,
                                   "no additional args allowed if flags == 0");
     } else if (FlagsValue.isOneBitSet(0)) {
-      if (CLI.Args.size() != ChainCallArgIdx::FallbackCallee + 1) {
+      if (CLI.Args.size() != MY_UNITY_ID::ChainCallArgIdx::FallbackCallee + 1) {
         return lowerUnhandledCall(CLI, InVals, "expected 3 additional args");
       }
 
@@ -3761,7 +3761,7 @@ SDValue SITargetLowering::LowerCall(CallLoweringInfo &CLI,
       }
 
       UsesDynamicVGPRs = true;
-      std::for_each(CLI.Args.begin() + ChainCallArgIdx::NumVGPRs,
+      std::for_each(CLI.Args.begin() + MY_UNITY_ID::ChainCallArgIdx::NumVGPRs,
                     CLI.Args.end(), PushNodeOrTargetConstant);
     }
   }

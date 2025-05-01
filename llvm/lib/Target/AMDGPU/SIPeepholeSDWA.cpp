@@ -540,9 +540,9 @@ bool SDWASrcOperand::canCombineSelections(const MachineInstr &MI,
 
   using namespace AMDGPU;
 
-  return canCombineOpSel(MI, TII, OpName::src0, OpName::src0_sel,
+  return canCombineOpSel(MI, TII, AMDGPU::OpName::src0, AMDGPU::OpName::src0_sel,
                          getReplacedOperand(), getSrcSel()) &&
-         canCombineOpSel(MI, TII, OpName::src1, OpName::src1_sel,
+         canCombineOpSel(MI, TII, AMDGPU::OpName::src1, AMDGPU::OpName::src1_sel,
                          getReplacedOperand(), getSrcSel());
 }
 
@@ -982,7 +982,7 @@ static raw_ostream& operator<<(raw_ostream &OS, const SDWAOperand &Operand) {
 void SIPeepholeSDWA::matchSDWAOperands(MachineBasicBlock &MBB) {
   for (MachineInstr &MI : MBB) {
     if (auto Operand = matchSDWAOperand(MI)) {
-      LLVM_DEBUG(dbgs() << "Match: " << MI << "To: " << *Operand << '\n');
+      // LLVM_DEBUG(dbgs() << "Match: " << MI << "To: " << *Operand << '\n');
       SDWAOperands[&MI] = std::move(Operand);
       ++NumSDWAPatternsFound;
     }
@@ -1287,7 +1287,7 @@ bool SIPeepholeSDWA::convertToSDWA(MachineInstr &MI,
   // Apply all sdwa operand patterns.
   bool Converted = false;
   for (auto &Operand : SDWAOperands) {
-    LLVM_DEBUG(dbgs() << *SDWAInst << "\nOperand: " << *Operand);
+    // LLVM_DEBUG(dbgs() << *SDWAInst << "\nOperand: " << *Operand);
     // There should be no intersection between SDWA operands and potential MIs
     // e.g.:
     // v_and_b32 v0, 0xff, v1 -> src:v1 sel:BYTE_0

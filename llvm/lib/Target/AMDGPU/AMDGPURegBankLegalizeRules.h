@@ -101,7 +101,7 @@ enum UniformityLLTOpPredicateID {
 // In most cases, this serves as a LLT and register bank assert.
 // Can change operands and insert copies, extends, truncs, and read-any-lanes.
 // Anything more complicated requires LoweringMethod.
-enum RegBankLLTMappingApplyID {
+enum class RegBankLLTMappingApplyID {
   InvalidMapping,
   None,
   IntrId,
@@ -219,7 +219,7 @@ class SetOfRulesForOpcode {
   // - FastTypes == Standard Uni[0] holds Mapping in case Op 0 is uniform S32
   // - FastTypes == Vector Div[3] holds Mapping in case Op 0 is divergent V4S32
   FastRulesTypes FastTypes = NoFastRules;
-#define InvMapping RegBankLLTMapping({InvalidMapping}, {InvalidMapping})
+#define InvMapping RegBankLLTMapping({RegBankLLTMappingApplyID::InvalidMapping}, {RegBankLLTMappingApplyID::InvalidMapping})
   RegBankLLTMapping Uni[4] = {InvMapping, InvMapping, InvMapping, InvMapping};
   RegBankLLTMapping Div[4] = {InvMapping, InvMapping, InvMapping, InvMapping};
 

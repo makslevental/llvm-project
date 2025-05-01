@@ -668,7 +668,7 @@ static void castBufferRsrcArgToV4I32(MachineInstr &MI, MachineIRBuilder &B,
 AMDGPULegalizerInfo::AMDGPULegalizerInfo(const GCNSubtarget &ST_,
                                          const GCNTargetMachine &TM)
   :  ST(ST_) {
-  using namespace TargetOpcode;
+  // using namespace TargetOpcode;
 
   auto GetAddrSpacePtr = [&TM](unsigned AS) {
     return LLT::pointer(AS, TM.getPointerSizeInBits(AS));

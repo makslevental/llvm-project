@@ -114,6 +114,7 @@
 
 #define DEBUG_TYPE "amdgpu-sw-lower-lds"
 #define COV5_HIDDEN_DYN_LDS_SIZE_ARG 15
+#define PREFIX_MY_UNITY_ID(x) MY_UNITY_ID_##x
 
 using namespace llvm;
 using namespace AMDGPU;
@@ -221,7 +222,7 @@ private:
   AsanInstrumentInfo AsanInfo;
 };
 
-template <typename T> SetVector<T> sortByName(std::vector<T> &&V) {
+template <typename T> SetVector<T> PREFIX_MY_UNITY_ID(sortByName)(std::vector<T> &&V) {
   // Sort the vector of globals or Functions based on their name.
   // Returns a SetVector of globals/Functions.
   sort(V, [](const auto *L, const auto *R) {
@@ -233,7 +234,7 @@ template <typename T> SetVector<T> sortByName(std::vector<T> &&V) {
 SetVector<GlobalVariable *> AMDGPUSwLowerLDS::getOrderedNonKernelAllLDSGlobals(
     SetVector<GlobalVariable *> &Variables) {
   // Sort all the non-kernel LDS accesses based on their name.
-  return sortByName(
+  return PREFIX_MY_UNITY_ID(sortByName)(
       std::vector<GlobalVariable *>(Variables.begin(), Variables.end()));
 }
 
@@ -246,7 +247,7 @@ SetVector<Function *> AMDGPUSwLowerLDS::getOrderedIndirectLDSAccessingKernels(
     report_fatal_error("Unimplemented SW LDS lowering for > 2**32 kernels");
   }
   SetVector<Function *> OrderedKernels =
-      sortByName(std::vector<Function *>(Kernels.begin(), Kernels.end()));
+      PREFIX_MY_UNITY_ID(sortByName)(std::vector<Function *>(Kernels.begin(), Kernels.end()));
   for (size_t i = 0; i < Kernels.size(); i++) {
     Metadata *AttrMDArgs[1] = {
         ConstantAsMetadata::get(IRB.getInt32(i)),
@@ -1106,16 +1107,16 @@ static void reorderStaticDynamicIndirectLDSSet(KernelLDSParameters &LDSParams) {
   // direct or indirect access on basis of name.
   auto &DirectAccess = LDSParams.DirectAccess;
   auto &IndirectAccess = LDSParams.IndirectAccess;
-  LDSParams.DirectAccess.StaticLDSGlobals = sortByName(
+  LDSParams.DirectAccess.StaticLDSGlobals = PREFIX_MY_UNITY_ID(sortByName)(
       std::vector<GlobalVariable *>(DirectAccess.StaticLDSGlobals.begin(),
                                     DirectAccess.StaticLDSGlobals.end()));
-  LDSParams.DirectAccess.DynamicLDSGlobals = sortByName(
+  LDSParams.DirectAccess.DynamicLDSGlobals = PREFIX_MY_UNITY_ID(sortByName)(
       std::vector<GlobalVariable *>(DirectAccess.DynamicLDSGlobals.begin(),
                                     DirectAccess.DynamicLDSGlobals.end()));
-  LDSParams.IndirectAccess.StaticLDSGlobals = sortByName(
+  LDSParams.IndirectAccess.StaticLDSGlobals = PREFIX_MY_UNITY_ID(sortByName)(
       std::vector<GlobalVariable *>(IndirectAccess.StaticLDSGlobals.begin(),
                                     IndirectAccess.StaticLDSGlobals.end()));
-  LDSParams.IndirectAccess.DynamicLDSGlobals = sortByName(
+  LDSParams.IndirectAccess.DynamicLDSGlobals = PREFIX_MY_UNITY_ID(sortByName)(
       std::vector<GlobalVariable *>(IndirectAccess.DynamicLDSGlobals.begin(),
                                     IndirectAccess.DynamicLDSGlobals.end()));
 }
@@ -1250,7 +1251,7 @@ bool AMDGPUSwLowerLDS::run() {
     for (auto &K : FuncLDSAccessInfo.NonKernelToLDSAccessMap) {
       Function *Func = K.first;
       DenseSet<GlobalVariable *> &LDSGlobals = K.second;
-      SetVector<GlobalVariable *> OrderedLDSGlobals = sortByName(
+      SetVector<GlobalVariable *> OrderedLDSGlobals = PREFIX_MY_UNITY_ID(sortByName)(
           std::vector<GlobalVariable *>(LDSGlobals.begin(), LDSGlobals.end()));
       lowerNonKernelLDSAccesses(Func, OrderedLDSGlobals, NKLDSParams);
     }

@@ -12,6 +12,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#pragma once
+
 #include "GCNSubtarget.h"
 #include "llvm/CodeGen/MachineBasicBlock.h"
 #include "llvm/CodeGen/MachinePostDominators.h"

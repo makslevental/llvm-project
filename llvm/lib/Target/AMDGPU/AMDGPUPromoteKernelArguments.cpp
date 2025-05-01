@@ -136,7 +136,7 @@ bool AMDGPUPromoteKernelArguments::promoteLoad(LoadInst *LI) {
 }
 
 // skip allocas
-static BasicBlock::iterator getInsertPt(BasicBlock &BB) {
+static BasicBlock::iterator PREFIX_MY_UNITY_ID(getInsertPt)(BasicBlock &BB) {
   BasicBlock::iterator InsPt = BB.getFirstInsertionPt();
   for (BasicBlock::iterator E = BB.end(); InsPt != E; ++InsPt) {
     AllocaInst *AI = dyn_cast<AllocaInst>(&*InsPt);
@@ -159,7 +159,7 @@ bool AMDGPUPromoteKernelArguments::run(Function &F, MemorySSA &MSSA,
   if (CC != CallingConv::AMDGPU_KERNEL || F.arg_empty())
     return false;
 
-  ArgCastInsertPt = &*getInsertPt(*F.begin());
+  ArgCastInsertPt = &*PREFIX_MY_UNITY_ID(getInsertPt)(*F.begin());
   this->MSSA = &MSSA;
   this->AA = &AA;
 

@@ -2236,7 +2236,7 @@ bool SIGfx11CacheControl::enableVolatileAndOrNonTemporal(
 
 bool SIGfx12CacheControl::setTH(const MachineBasicBlock::iterator MI,
                                 AMDGPU::CPol::CPol Value) const {
-  MachineOperand *CPol = TII->getNamedOperand(*MI, OpName::cpol);
+  MachineOperand *CPol = TII->getNamedOperand(*MI, AMDGPU::OpName::cpol);
   if (!CPol)
     return false;
 
@@ -2251,7 +2251,7 @@ bool SIGfx12CacheControl::setTH(const MachineBasicBlock::iterator MI,
 
 bool SIGfx12CacheControl::setScope(const MachineBasicBlock::iterator MI,
                                    AMDGPU::CPol::CPol Value) const {
-  MachineOperand *CPol = TII->getNamedOperand(*MI, OpName::cpol);
+  MachineOperand *CPol = TII->getNamedOperand(*MI, AMDGPU::OpName::cpol);
   if (!CPol)
     return false;
 
@@ -2541,7 +2541,7 @@ bool SIGfx12CacheControl::enableVolatileAndOrNonTemporal(
 
 bool SIGfx12CacheControl::expandSystemScopeStore(
     MachineBasicBlock::iterator &MI) const {
-  MachineOperand *CPol = TII->getNamedOperand(*MI, OpName::cpol);
+  MachineOperand *CPol = TII->getNamedOperand(*MI, AMDGPU::OpName::cpol);
   if (CPol && ((CPol->getImm() & CPol::SCOPE) == CPol::SCOPE_SYS))
     return insertWaitsBeforeSystemScopeStore(MI);
 

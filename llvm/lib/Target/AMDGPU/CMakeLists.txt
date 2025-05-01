@@ -210,6 +210,25 @@ add_llvm_target(AMDGPUCodeGen
   AMDGPU
   )
 
+set(before [[
+#ifndef PREFIX_MY_UNITY_ID
+#define PREFIX_MY_UNITY_ID(x) MY_UNITY_ID_##x
+#endif
+]])
+set(after [[
+#ifdef DEBUG_TYPE
+#undef DEBUG_TYPE
+#endif
+]])
+set_target_properties(LLVMAMDGPUCodeGen PROPERTIES
+  UNITY_BUILD "ON"
+  UNITY_BUILD_BATCH_SIZE 0
+  UNITY_BUILD_UNIQUE_ID "MY_UNITY_ID"
+  UNITY_BUILD_CODE_BEFORE_INCLUDE "${before}"
+  UNITY_BUILD_CODE_AFTER_INCLUDE "${after}"
+)
+target_compile_options(LLVMAMDGPUCodeGen PRIVATE -ferror-limit=0)
+
 add_subdirectory(AsmParser)
 add_subdirectory(Disassembler)
 add_subdirectory(MCA)
