@@ -39,6 +39,23 @@ enum class GCNSchedStageID : unsigned {
 raw_ostream &operator<<(raw_ostream &OS, const GCNSchedStageID &StageID);
 #endif
 
+// Tracks the number of cycles that a resource is occupied. Requires top-down
+// scheduling.
+struct ProcRes {
+  unsigned CyclesReserved = 0;
+
+  void reset() { CyclesReserved = 0; }
+
+  void reserve(unsigned Cycles) { CyclesReserved += Cycles; }
+
+  void release(unsigned Cycles) {
+    if (Cycles > CyclesReserved)
+      CyclesReserved = 0;
+    else
+      CyclesReserved -= Cycles;
+  }
+};
+
 /// This is a minimal scheduler strategy.  The main difference between this
 /// and the GenericScheduler is that GCNSchedStrategy uses different
 /// heuristics to determine excess/critical pressure sets.
@@ -54,6 +71,11 @@ protected:
                      const RegPressureTracker &RPTracker,
                      const SIRegisterInfo *SRI, unsigned SGPRPressure,
                      unsigned VGPRPressure, bool IsBottomUp);
+
+  // If the XDL resource is not occupied, try to schedule a ready MFMA,
+  // otherwise, try not to stall XDL.
+  bool tryXDL(SchedCandidate &Cand, SchedCandidate &TryCand,
+              SchedBoundary *Zone) const;
 
   std::vector<unsigned> Pressure;
 
@@ -107,6 +129,12 @@ public:
 
   unsigned VGPRLimitBias = 0;
 
+  // Processor resource for XDL.
+  ProcRes XDLProcRes;
+
+  // Use custom resource tracking for scheduling.
+  bool CustomResTracking = false;
+
   GCNSchedStrategy(const MachineSchedContext *C);
 
   SUnit *pickNode(bool &IsTopNode) override;
@@ -139,6 +167,9 @@ class GCNMaxOccupancySchedStrategy final : public GCNSchedStrategy {
 public:
   GCNMaxOccupancySchedStrategy(const MachineSchedContext *C,
                                bool IsLegacyScheduler = false);
+
+  bool tryCandidate(SchedCandidate &Cand, SchedCandidate &TryCand,
+                    SchedBoundary *Zone) const override;
 };
 
 /// The goal of this scheduling strategy is to maximize ILP for a single wave
@@ -540,6 +571,25 @@ public:
       : GCNSchedStage(StageID, DAG) {}
 };
 
+class GCNPostSchedStrategy : public PostGenericScheduler {
+protected:
+  bool tryCandidate(SchedCandidate &Cand, SchedCandidate &TryCand) override;
+
+  SUnit *pickNode(bool &IsTopNode) override;
+
+  // If the XDL resource is not occupied, try to schedule a ready MFMA,
+  // otherwise, try not to stall XDL.
+  bool tryXDL(SchedCandidate &Cand, SchedCandidate &TryCand);
+
+public:
+  // Processor resource for XDL.
+  ProcRes XDLProcRes;
+
+  bool CustomResTracking = false;
+
+  GCNPostSchedStrategy(const MachineSchedContext *C);
+};
+
 class GCNPostScheduleDAGMILive final : public ScheduleDAGMI {
 private:
   std::vector<std::unique_ptr<ScheduleDAGMutation>> SavedMutations;
@@ -552,7 +602,7 @@ public:
   void finalizeSchedule() override;
 
   GCNPostScheduleDAGMILive(MachineSchedContext *C,
-                           std::unique_ptr<MachineSchedStrategy> S,
+                           std::unique_ptr<GCNPostSchedStrategy> S,
                            bool RemoveKillFlags);
 };
 
