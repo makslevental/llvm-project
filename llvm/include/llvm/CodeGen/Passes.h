@@ -383,7 +383,10 @@ LLVM_ABI extern char &OptimizePHIsLegacyID;
 /// StackSlotColoring - This pass performs stack slot coloring.
 LLVM_ABI extern char &StackSlotColoringID;
 
-/// This pass lays out funclets contiguously.
+/// UnisonMIRPrepare - This pass prepares for printing Unison-style MIR.
+LLVM_ABI extern char &UnisonMIRPrepareID;
+
+  /// This pass lays out funclets contiguously.
 LLVM_ABI extern char &FuncletLayoutID;
 
 /// This pass inserts the XRay instrumentation sleds if they are supported by

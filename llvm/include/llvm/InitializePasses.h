@@ -329,6 +329,7 @@ LLVM_ABI void initializeTypePromotionLegacyPass(PassRegistry &);
 LLVM_ABI void initializeInitUndefLegacyPass(PassRegistry &);
 LLVM_ABI void initializeUniformityInfoWrapperPassPass(PassRegistry &);
 LLVM_ABI void initializeUnifyLoopExitsLegacyPassPass(PassRegistry &);
+LLVM_ABI void initializeUnisonMIRPreparePass(PassRegistry&);
 LLVM_ABI void initializeUnpackMachineBundlesPass(PassRegistry &);
 LLVM_ABI void initializeUnreachableBlockElimLegacyPassPass(PassRegistry &);
 LLVM_ABI void initializeUnreachableMachineBlockElimLegacyPass(PassRegistry &);

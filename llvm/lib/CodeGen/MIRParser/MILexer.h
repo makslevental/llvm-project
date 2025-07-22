@@ -114,6 +114,7 @@ struct MIToken {
     kw_invariant,
     kw_align,
     kw_basealign,
+    kw_freq, // Unison MIR style extension.
     kw_addrspace,
     kw_stack,
     kw_got,
@@ -121,11 +122,14 @@ struct MIToken {
     kw_constant_pool,
     kw_call_entry,
     kw_custom,
+    kw_unknown, // Unison MIR style extension.
     kw_liveout,
     kw_landing_pad,
     kw_inlineasm_br_indirect_target,
     kw_ehfunclet_entry,
     kw_liveins,
+    kw_liveouts, // Unison MIR style extension.
+    kw_exit, // Unison MIR style extension.
     kw_successors,
     kw_floatpred,
     kw_intpred,
