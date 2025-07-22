@@ -18,6 +18,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TableGen/Main.h"
 #include "llvm/TableGen/Record.h"
+#include "llvm/TableGen/Unison.h"
 #include "llvm/TableGen/SetTheory.h"
 #include "llvm/TableGen/TableGenBackend.h"
 #include <cassert>
@@ -63,6 +64,7 @@ static TableGen::Emitter::Opt X[] = {
     {"null-backend", [](const RecordKeeper &Records, raw_ostream &OS) {},
      "Do nothing after parsing (useful for timing)"},
     {"dump-json", EmitJSON, "Dump all records as machine-readable JSON"},
+       {"unison", EmitUnisonFile, "emit unison"},
     {"print-enums", printEnums, "Print enum values for a class"},
     {"print-sets", printSets, "Print expanded sets for testing DAG exprs"},
 };
