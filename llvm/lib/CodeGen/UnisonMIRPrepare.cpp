@@ -60,13 +60,14 @@ INITIALIZE_PASS_END(UnisonMIRPrepare, DEBUG_TYPE,
 
 char UnisonMIRPrepare::ID = 0;
 
-MDNode *createMDTaggedTuple(MachineFunction &MF, std::string Tag, int Val) {
+MDNode *createMDTaggedTuple(MachineFunction &MF, std::string Tag,
+                            uint64_t Val) {
   LLVMContext &Context = MF.getFunction().getContext();
   MDBuilder Builder(Context);
   return MDNode::get(Context,
                      {Builder.createString(Tag),
                       Builder.createConstant(
-                          ConstantInt::get(Type::getInt32Ty(Context), Val))});
+                          ConstantInt::get(Type::getInt64Ty(Context), Val))});
 }
 
 UnisonMIRPrepare::UnisonMIRPrepare() : MachineFunctionPass(ID) {
@@ -93,7 +94,7 @@ bool UnisonMIRPrepare::runOnMachineFunction(MachineFunction &MF) {
 
 void UnisonMIRPrepare::annotateFrequency(MachineBasicBlock &MBB) {
   MachineFunction &MF = *MBB.getParent();
-  int Freq = MBFI->getMBFI().getBlockFreq(&MBB).getFrequency();
+  uint64_t Freq = MBFI->getMBFI().getBlockFreq(&MBB).getFrequency();
   MDNode *MD = createMDTaggedTuple(MF, "unison-block-frequency", Freq);
   auto MI = MBB.instr_begin();
   DebugLoc DL;
