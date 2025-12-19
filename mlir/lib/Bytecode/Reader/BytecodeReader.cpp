@@ -1190,8 +1190,9 @@ LogicalResult AttrTypeReader::initialize(
 }
 
 template <typename T>
-T AttrTypeReader::resolveEntry(SmallVectorImpl<Entry<T>> &entries, size_t index,
-                               StringRef entryType) {
+T AttrTypeReader::resolveEntry(SmallVectorImpl<Entry<T>> &entries,
+                               uint64_t index, StringRef entryType,
+                               uint64_t depth) {
   if (index >= entries.size()) {
     emitError(fileLoc) << "invalid " << entryType << " index: " << index;
     return {};
